@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="AppTest" time="0.019" tests="1" errors="0" skipped="0" failures="0">
+  <properties>
+    <property name="java.specification.version" value="22"/>
+    <property name="sun.cpu.isalist" value="amd64"/>
+    <property name="sun.jnu.encoding" value="Cp1252"/>
+    <property name="java.class.path" value="E:\Documents\Teaching\PSA\OOP\Demo\DTDB\DTDBv1\QuanLyDoiTuongDacBiet\target\test-classes;E:\Documents\Teaching\PSA\OOP\Demo\DTDB\DTDBv1\QuanLyDoiTuongDacBiet\target\classes;C:\Users\Mr Thanh\.m2\repository\jakarta\xml\bind\jakarta.xml.bind-api\2.3.3\jakarta.xml.bind-api-2.3.3.jar;C:\Users\Mr Thanh\.m2\repository\jakarta\activation\jakarta.activation-api\1.2.2\jakarta.activation-api-1.2.2.jar;C:\Users\Mr Thanh\.m2\repository\javax\xml\bind\jaxb-api\2.3.1\jaxb-api-2.3.1.jar;C:\Users\Mr Thanh\.m2\repository\javax\activation\javax.activation-api\1.2.0\javax.activation-api-1.2.0.jar;C:\Users\Mr Thanh\.m2\repository\com\sun\xml\bind\jaxb-impl\2.3.4\jaxb-impl-2.3.4.jar;C:\Users\Mr Thanh\.m2\repository\com\sun\activation\jakarta.activation\1.2.2\jakarta.activation-1.2.2.jar;C:\Users\Mr Thanh\.m2\repository\junit\junit\3.8.1\junit-3.8.1.jar;C:\Users\Mr Thanh\.m2\repository\unknown\binary\KGradientPanel\SNAPSHOT\KGradientPanel-SNAPSHOT.jar;C:\Users\Mr Thanh\.m2\repository\com\toedter\jcalendar\1.4\jcalendar-1.4.jar;C:\Users\Mr Thanh\.m2\repository\unknown\binary\TimingFramework-0.55\SNAPSHOT\TimingFramework-0.55-SNAPSHOT.jar;C:\Users\Mr Thanh\.m2\repository\unknown\binary\mysql-connector-java-5.1.23-bin\SNAPSHOT\mysql-connector-java-5.1.23-bin-SNAPSHOT.jar;"/>
+    <property name="java.vm.vendor" value="Oracle Corporation"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="user.variant" value=""/>
+    <property name="java.vendor.url" value="https://java.oracle.com/"/>
+    <property name="user.timezone" value="Asia/Saigon"/>
+    <property name="os.name" value="Windows 11"/>
+    <property name="java.vm.specification.version" value="22"/>
+    <property name="user.country" value="US"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="sun.boot.library.path" value="C:\Program Files\Java\jdk-22\bin"/>
+    <property name="sun.java.command" value="C:\Users\Mr Thanh\AppData\Local\Temp\surefire5909519023776676560\surefirebooter-20250410155154040_3.jar C:\Users\Mr Thanh\AppData\Local\Temp\surefire5909519023776676560 2025-04-10T15-51-53_937-jvmRun1 surefire-20250410155154040_1tmp surefire_0-20250410155154040_2tmp"/>
+    <property name="jdk.debug" value="release"/>
+    <property name="surefire.test.class.path" value="E:\Documents\Teaching\PSA\OOP\Demo\DTDB\DTDBv1\QuanLyDoiTuongDacBiet\target\test-classes;E:\Documents\Teaching\PSA\OOP\Demo\DTDB\DTDBv1\QuanLyDoiTuongDacBiet\target\classes;C:\Users\Mr Thanh\.m2\repository\jakarta\xml\bind\jakarta.xml.bind-api\2.3.3\jakarta.xml.bind-api-2.3.3.jar;C:\Users\Mr Thanh\.m2\repository\jakarta\activation\jakarta.activation-api\1.2.2\jakarta.activation-api-1.2.2.jar;C:\Users\Mr Thanh\.m2\repository\javax\xml\bind\jaxb-api\2.3.1\jaxb-api-2.3.1.jar;C:\Users\Mr Thanh\.m2\repository\javax\activation\javax.activation-api\1.2.0\javax.activation-api-1.2.0.jar;C:\Users\Mr Thanh\.m2\repository\com\sun\xml\bind\jaxb-impl\2.3.4\jaxb-impl-2.3.4.jar;C:\Users\Mr Thanh\.m2\repository\com\sun\activation\jakarta.activation\1.2.2\jakarta.activation-1.2.2.jar;C:\Users\Mr Thanh\.m2\repository\junit\junit\3.8.1\junit-3.8.1.jar;C:\Users\Mr Thanh\.m2\repository\unknown\binary\KGradientPanel\SNAPSHOT\KGradientPanel-SNAPSHOT.jar;C:\Users\Mr Thanh\.m2\repository\com\toedter\jcalendar\1.4\jcalendar-1.4.jar;C:\Users\Mr Thanh\.m2\repository\unknown\binary\TimingFramework-0.55\SNAPSHOT\TimingFramework-0.55-SNAPSHOT.jar;C:\Users\Mr Thanh\.m2\repository\unknown\binary\mysql-connector-java-5.1.23-bin\SNAPSHOT\mysql-connector-java-5.1.23-bin-SNAPSHOT.jar;"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="C:\Users\Mr Thanh"/>
+    <property name="user.language" value="en"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.version.date" value="2024-03-19"/>
+    <property name="java.home" value="C:\Program Files\Java\jdk-22"/>
+    <property name="file.separator" value="\"/>
+    <property name="basedir" value="E:\Documents\Teaching\PSA\OOP\Demo\DTDB\DTDBv1\QuanLyDoiTuongDacBiet"/>
+    <property name="java.vm.compressedOopsMode" value="Zero based"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="surefire.real.class.path" value="C:\Users\Mr Thanh\AppData\Local\Temp\surefire5909519023776676560\surefirebooter-20250410155154040_3.jar"/>
+    <property name="user.script" value=""/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="java.runtime.version" value="22+36-2370"/>
+    <property name="user.name" value="Mr Thanh"/>
+    <property name="stdout.encoding" value="Cp1252"/>
+    <property name="path.separator" value=";"/>
+    <property name="os.version" value="10.0"/>
+    <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="java.vm.name" value="Java HotSpot(TM) 64-Bit Server VM"/>
+    <property name="maven.ext.class.path" value="C:\Program Files\NetBeans-19\netbeans\java\maven-nblib\netbeans-eventspy.jar"/>
+    <property name="localRepository" value="C:\Users\Mr Thanh\.m2\repository"/>
+    <property name="java.vendor.url.bug" value="https://bugreport.java.com/bugreport/"/>
+    <property name="java.io.tmpdir" value="C:\Users\MRTHAN~1\AppData\Local\Temp\"/>
+    <property name="java.version" value="22"/>
+    <property name="user.dir" value="E:\Documents\Teaching\PSA\OOP\Demo\DTDB\DTDBv1\QuanLyDoiTuongDacBiet"/>
+    <property name="os.arch" value="amd64"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="sun.os.patch.level" value=""/>
+    <property name="native.encoding" value="Cp1252"/>
+    <property name="java.library.path" value="C:\Program Files\Java\jdk-22\bin;C:\Windows\Sun\Java\bin;C:\Windows\system32;C:\Windows;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\VMware\VMware Workstation\bin\;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\PuTTY\;C:\Program Files\gnuplot\bin;D:\Documents\Teaching\PSA\OOP\Demo\code\Esapitest\esapiexample\src\resources\;C:\Program Files (x86)\Bitvise SSH Client;C:\Users\Mr Thanh\AppData\Local\Programs\Python\Launcher\;C:\Users\Mr Thanh\AppData\Local\Microsoft\WindowsApps;C:\Users\Mr Thanh\AppData\Local\Programs\MiKTeX\miktex\bin\x64\;C:\Users\Mr Thanh\AppData\Local\Programs\Microsoft VS Code\bin;."/>
+    <property name="java.vm.info" value="mixed mode, sharing"/>
+    <property name="stderr.encoding" value="Cp1252"/>
+    <property name="java.vendor" value="Oracle Corporation"/>
+    <property name="java.vm.version" value="22+36-2370"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="java.class.version" value="66.0"/>
+  </properties>
+  <testcase name="testApp" classname="AppTest" time="0.002"/>
+</testsuite>
