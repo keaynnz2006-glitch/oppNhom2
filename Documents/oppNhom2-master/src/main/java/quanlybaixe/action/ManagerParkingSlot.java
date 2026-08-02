@@ -3,8 +3,8 @@ package quanlybaixe.action;
 import quanlybaixe.entity.ParkingSlotXML;
 import quanlybaixe.entity.ParkingSlot;
 import quanlybaixe.utils.FileUtils;
+
 import java.text.Collator;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -37,20 +37,12 @@ public class ManagerParkingSlot {
         FileUtils.writeXMLtoFile(PARKING_FILE_NAME, parkingXML);
     }
     
-    // Tìm kiếm theo Biển số xe
-    public List<ParkingSlot> searchByBienSo(String search) {
-        List<ParkingSlot> temp = new ArrayList<ParkingSlot>();
-        for (ParkingSlot slot : listParkingSlots) {
-            if (slot.getBienSo() != null && slot.getBienSo().toLowerCase().contains(search.toLowerCase())) {
-                temp.add(slot);
-            }
-        }
-        return temp;
-    }
+    // --- TÌM KIẾM ---
     
-    // Tìm kiếm theo Tên vị trí đỗ
+    // Tìm kiếm theo Tên vị trí đỗ (Ví dụ: A01, B02)
     public List<ParkingSlot> searchByTenViTri(String search) {
         List<ParkingSlot> temp = new ArrayList<ParkingSlot>();
+        if (search == null) return temp;
         for (ParkingSlot slot : listParkingSlots) {
             if (slot.getTenViTri() != null && slot.getTenViTri().toLowerCase().contains(search.toLowerCase())) {
                 temp.add(slot);
@@ -59,17 +51,20 @@ public class ManagerParkingSlot {
         return temp;
     }
     
-    // Tìm kiếm theo Loại xe
-    public List<ParkingSlot> searchByLoaiXe(String search) {
+    // Tìm kiếm theo Loại Slot (Ví dụ: Xe máy, Ô tô, VIP)
+    public List<ParkingSlot> searchByLoaiSlot(String search) {
         List<ParkingSlot> temp = new ArrayList<ParkingSlot>();
+        if (search == null) return temp;
         for (ParkingSlot slot : listParkingSlots) {
-            if (slot.getLoaiXe() != null && slot.getLoaiXe().toLowerCase().contains(search.toLowerCase())) {
+            if (slot.getLoaiSlot() != null && slot.getLoaiSlot().toLowerCase().contains(search.toLowerCase())) {
                 temp.add(slot);
             }
         }
         return temp;
     }
     
+    // --- THAO TÁC CRUD ---
+
     public void add(ParkingSlot slot) {
         int max = 0;
         for (int i = 0; i < listParkingSlots.size(); i++) {
@@ -82,28 +77,27 @@ public class ManagerParkingSlot {
         writeListParkingSlots(listParkingSlots);
     }
     
-    // Kiểm tra vị trí đỗ trùng lặp
+    // Kiểm tra tên vị trí đỗ trùng lặp
     public boolean isViTriUnique(ParkingSlot slot) {
         String viTri = slot.getTenViTri();
+        if (viTri == null) return true;
         for (ParkingSlot existingSlot : listParkingSlots) {
-            if (existingSlot.getTenViTri().equalsIgnoreCase(viTri) && existingSlot.getId() != slot.getId()) {
+            if (existingSlot.getTenViTri() != null && 
+                existingSlot.getTenViTri().equalsIgnoreCase(viTri) && 
+                existingSlot.getId() != slot.getId()) {
                 return false; 
             }
         }
         return true; 
     }
     
-    public void edit(ParkingSlot slot) throws ParseException {
+    public void edit(ParkingSlot slot) {
         int size = listParkingSlots.size();
         for (int i = 0; i < size; i++) {
             if (listParkingSlots.get(i).getId() == slot.getId()) {
-                listParkingSlots.get(i).setBienSo(slot.getBienSo());
-                listParkingSlots.get(i).setLoaiXe(slot.getLoaiXe());
-                listParkingSlots.get(i).setMauXe(slot.getMauXe());
-                listParkingSlots.get(i).setNgayGui(slot.getNgayGui());
-                listParkingSlots.get(i).setGiaTien(slot.getGiaTien());
                 listParkingSlots.get(i).setTenViTri(slot.getTenViTri());
                 listParkingSlots.get(i).setLoaiSlot(slot.getLoaiSlot());
+                listParkingSlots.get(i).setGiaTien(slot.getGiaTien());
                 listParkingSlots.get(i).setTrangThai(slot.isTrangThai());
                 listParkingSlots.get(i).setGhiChu(slot.getGhiChu());
 
@@ -135,12 +129,16 @@ public class ManagerParkingSlot {
         return false;
     }
     
-    // Sắp xếp theo vị trí đỗ bãi xe tiếng Việt
+    // --- SẮP XẾP ---
+
+    // Sắp xếp theo tên vị trí đỗ bãi xe tiếng Việt
     public void sortSlotsByViTri() {
         Collections.sort(listParkingSlots, new Comparator<ParkingSlot>() {
             public int compare(ParkingSlot p1, ParkingSlot p2) {
                 Collator collator = Collator.getInstance(new Locale("vi", "VN"));
-                return collator.compare(p1.getTenViTri(), p2.getTenViTri());
+                String v1 = p1.getTenViTri() != null ? p1.getTenViTri() : "";
+                String v2 = p2.getTenViTri() != null ? p2.getTenViTri() : "";
+                return collator.compare(v1, v2);
             }
         });
     }
@@ -154,7 +152,7 @@ public class ManagerParkingSlot {
         });
     }
     
-    // Sắp xếp theo ID vị trí xe
+    // Sắp xếp theo ID vị trí
     public void sortSlotsByID() {
         Collections.sort(listParkingSlots, new Comparator<ParkingSlot>() {
             public int compare(ParkingSlot p1, ParkingSlot p2) {
@@ -165,5 +163,28 @@ public class ManagerParkingSlot {
     
     public List<ParkingSlot> getListParkingSlots() {
         return this.listParkingSlots;
+    }
+
+    // --- BỔ SUNG: CẬP NHẬT TRẠNG THÁI Ô ĐỖ KHI THÊM/XÓA XE ---
+    public void updateSlotStatus(String tenViTri, boolean isOccupied) {
+        if (tenViTri == null) return;
+        for (ParkingSlot slot : listParkingSlots) {
+            if (slot.getTenViTri() != null && slot.getTenViTri().equalsIgnoreCase(tenViTri)) {
+                slot.setTrangThai(isOccupied); // true = Đã có xe, false = Trống
+                writeListParkingSlots(listParkingSlots);
+                break;
+            }
+        }
+    }
+
+    // --- BỔ SUNG: LẤY DANH SÁCH VỊ TRÍ CÒN TRỐNG ĐỂ CHỌN KHI CHO XE MỚI VÀO ---
+    public List<ParkingSlot> getAvailableParkingSlots() {
+        List<ParkingSlot> availableSlots = new ArrayList<ParkingSlot>();
+        for (ParkingSlot slot : listParkingSlots) {
+            if (!slot.isTrangThai()) { // Chỉ lấy chỗ có trangThai == false (còn trống)
+                availableSlots.add(slot);
+            }
+        }
+        return availableSlots;
     }
 }

@@ -82,6 +82,7 @@ public class ManagerVehicleDetail {
         writeListVehicleDetails(listVehicleDetails);
     }
 
+    // Cập nhật: Bổ sung setViTriDo để dữ liệu vị trí không bị mất hoặc sai sót khi sửa
     public void edit(VehicleDetail detail) throws ParseException {
         int size = listVehicleDetails.size();
         for (int i = 0; i < size; i++) {
@@ -91,7 +92,8 @@ public class ManagerVehicleDetail {
                 listVehicleDetails.get(i).setMauXe(detail.getMauXe());
                 listVehicleDetails.get(i).setGiaTien(detail.getGiaTien());
                 listVehicleDetails.get(i).setNgayVaoBai(detail.getNgayVaoBai());
-                listVehicleDetails.get(i).setAnhXe(detail.getAnhXe());
+                listVehicleDetails.get(i).setViTriDo(detail.getViTriDo()); // Thêm cập nhật vị trí đỗ
+                listVehicleDetails.get(i).setHinhAnh(detail.getHinhAnh());
                 writeListVehicleDetails(listVehicleDetails);
                 break;
             }
@@ -137,7 +139,7 @@ public class ManagerVehicleDetail {
         writeListVehicleDetails(listVehicleDetails);
     }
     
-    // Sắp xếp theo Ngày vào bãi (Đã fix chuẩn mốc thời gian kiểu Date & lưu lại file)
+    // Sắp xếp theo Ngày vào bãi
     public void sortDetailsByNgayVaoBai() {
         Collections.sort(listVehicleDetails, new Comparator<VehicleDetail>() {
             @Override

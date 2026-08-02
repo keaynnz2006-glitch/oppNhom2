@@ -28,7 +28,6 @@ quanlybaixe\entity\VehicleDetail.class
 quanlybaixe\action\ManagerVehicleDetail$1.class
 quanlybaixe\controller\VehicleDetailController$CancelSearchVehicleListener.class
 quanlybaixe\entity\Vehicle.class
-quanlybaixe\controller\ParkingSlotController$CancelDialogSearchParkingSlotListener.class
 quanlybaixe\controller\VehicleDetailController$SortVehicleNgayVaoBaiListener.class
 quanlybaixe\utils\DateAdapter.class
 quanlybaixe\controller\MainController.class
@@ -45,6 +44,7 @@ quanlybaixe\controller\VehicleDetailController$UndoListener.class
 quanlybaixe\controller\VehicleDetailController$SearchVehicleViewListener.class
 quanlybaixe\controller\MainController$ChooseVehicleDetailListener.class
 quanlybaixe\controller\VehicleDetailController$ClearVehicleListener.class
+quanlybaixe\controller\VehicleDetailController$ParkingSlotChangeListener.class
 quanlybaixe\controller\ParkingSlotController.class
 com\raven\chart\LabelColor.class
 quanlybaixe\controller\ParkingSlotController$SearchParkingSlotListener.class
@@ -62,12 +62,12 @@ quanlybaixe\controller\VehicleDetailController$AddVehicleListener.class
 quanlybaixe\view\MainView.class
 quanlybaixe\action\ManagerParkingSlot$1.class
 quanlybaixe\controller\ParkingSlotController$EditParkingSlotListener.class
+quanlybaixe\view\ParkingSlotView$1.class
 quanlybaixe\controller\ParkingSlotController$AddParkingSlotListener.class
 quanlybaixe\action\CheckLogin.class
 quanlybaixe\quanly\QuanLyBaiXe.class
 quanlybaixe\controller\ParkingSlotController$DeleteParkingSlotListener.class
 com\raven\main\Main$3.class
 quanlybaixe\action\ManagerParkingSlot.class
-quanlybaixe\controller\ParkingSlotController$SearchParkingSlotViewListener.class
 quanlybaixe\controller\VehicleDetailController.class
 quanlybaixe\controller\ParkingSlotController$SortParkingSlotsListener.class

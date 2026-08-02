@@ -1,5 +1,6 @@
 package quanlybaixe.view;
 
+import quanlybaixe.entity.ParkingSlot;
 import quanlybaixe.entity.VehicleDetail;
 
 import javax.swing.*;
@@ -17,7 +18,8 @@ import java.util.stream.Collectors;
 
 public class ManagerView extends JFrame {
 
-    private JTextField txtId, txtBienSo, txtLoaiXe, txtMauXe, txtNgayVao, txtViTri, txtGiaTien, txtHinhAnh;
+    private JTextField txtId, txtBienSo, txtMauXe, txtNgayVao, txtGiaTien, txtHinhAnh;
+    private JComboBox<String> cbLoaiXe, cbViTri;
     private JLabel lblTotalCount, lblImagePreview, lblStatistic;
     private JRadioButton rdoSearchBienSo, rdoSearchLoaiXe, rdoSearchMauXe;
     private ButtonGroup bgSearch;
@@ -54,10 +56,15 @@ public class ManagerView extends JFrame {
 
         txtId = new JTextField(15); txtId.setEditable(false);
         txtBienSo = new JTextField(15);
-        txtLoaiXe = new JTextField(15);
+        
+        String[] loaiXeOptions = {"Ô tô", "Xe máy"};
+        cbLoaiXe = new JComboBox<>(loaiXeOptions);
+
         txtMauXe = new JTextField(15);
         txtNgayVao = new JTextField(15);
-        txtViTri = new JTextField(15);
+        
+        cbViTri = new JComboBox<>();
+        
         txtGiaTien = new JTextField(15);
         txtHinhAnh = new JTextField(10); txtHinhAnh.setEditable(false);
 
@@ -68,10 +75,10 @@ public class ManagerView extends JFrame {
 
         addFormField(panelForm, gbc, 0, "ID:", txtId);
         addFormField(panelForm, gbc, 1, "Biển số xe:", txtBienSo);
-        addFormField(panelForm, gbc, 2, "Loại xe:", txtLoaiXe);
+        addFormField(panelForm, gbc, 2, "Loại xe:", cbLoaiXe);
         addFormField(panelForm, gbc, 3, "Màu xe:", txtMauXe);
         addFormField(panelForm, gbc, 4, "Ngày vào (dd/MM/yyyy):", txtNgayVao);
-        addFormField(panelForm, gbc, 5, "Vị trí đỗ:", txtViTri);
+        addFormField(panelForm, gbc, 5, "Vị trí đỗ:", cbViTri);
         addFormField(panelForm, gbc, 6, "Giá tiền:", txtGiaTien);
         addFormField(panelForm, gbc, 7, "Hình ảnh:", panelImgInput);
 
@@ -176,18 +183,27 @@ public class ManagerView extends JFrame {
         statisticDialog.add(pSouth, BorderLayout.SOUTH);
     }
 
-    // --- CÁC HÀM XỬ LÝ CONTROLLER YÊU CẦU ---
+    public void setParkingSlotList(List<ParkingSlot> listSlot) {
+        cbViTri.removeAllItems();
+        if (listSlot != null) {
+            for (ParkingSlot slot : listSlot) {
+                cbViTri.addItem(slot.getTenViTri());
+            }
+        }
+    }
+
     public VehicleDetail getVehicleInfo() {
         try {
             int id = txtId.getText().isEmpty() ? 0 : Integer.parseInt(txtId.getText());
             String bienSo = txtBienSo.getText();
-            String loaiXe = txtLoaiXe.getText();
+            String loaiXe = (String) cbLoaiXe.getSelectedItem();
             String mauXe = txtMauXe.getText();
 
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
             Date ngayVao = txtNgayVao.getText().isEmpty() ? new Date() : sdf.parse(txtNgayVao.getText());
 
-            String viTri = txtViTri.getText();
+            String viTri = (String) cbViTri.getSelectedItem();
+            
             double giaTien = txtGiaTien.getText().isEmpty() ? 0.0 : Double.parseDouble(txtGiaTien.getText());
             String hinhAnh = txtHinhAnh.getText();
 
@@ -201,13 +217,30 @@ public class ManagerView extends JFrame {
     public void showVehicle(VehicleDetail v) {
         txtId.setText(String.valueOf(v.getId()));
         txtBienSo.setText(v.getBienSo());
-        txtLoaiXe.setText(v.getLoaiXe());
+        
+        if (v.getLoaiXe() != null) {
+            cbLoaiXe.setSelectedItem(v.getLoaiXe());
+        }
+        
         txtMauXe.setText(v.getMauXe());
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         txtNgayVao.setText(v.getNgayVaoBai() != null ? sdf.format(v.getNgayVaoBai()) : "");
 
-        txtViTri.setText(v.getViTriDo());
+        if (v.getViTriDo() != null) {
+            boolean exists = false;
+            for (int i = 0; i < cbViTri.getItemCount(); i++) {
+                if (v.getViTriDo().equalsIgnoreCase(cbViTri.getItemAt(i))) {
+                    exists = true;
+                    break;
+                }
+            }
+            if (!exists) {
+                cbViTri.addItem(v.getViTriDo());
+            }
+            cbViTri.setSelectedItem(v.getViTriDo());
+        }
+        
         txtGiaTien.setText(String.valueOf(v.getGiaTien()));
         txtHinhAnh.setText(v.getHinhAnh());
     }
@@ -224,15 +257,39 @@ public class ManagerView extends JFrame {
         }
     }
 
+    // Cập nhật quan trọng: Đảm bảo khi chọn dòng trên bảng, vị trí đỗ được nạp chính xác vào ComboBox
     public void fillVehicleFromSelectedRow() throws ParseException {
         int row = tableVehicle.getSelectedRow();
         if (row >= 0) {
             txtId.setText(tableModel.getValueAt(row, 0).toString());
             txtBienSo.setText(tableModel.getValueAt(row, 1).toString());
-            txtLoaiXe.setText(tableModel.getValueAt(row, 2).toString());
+            
+            Object loaiXeObj = tableModel.getValueAt(row, 2);
+            if (loaiXeObj != null) {
+                cbLoaiXe.setSelectedItem(loaiXeObj.toString());
+            }
+
             txtMauXe.setText(tableModel.getValueAt(row, 3).toString());
             txtNgayVao.setText(tableModel.getValueAt(row, 4).toString());
-            txtViTri.setText(tableModel.getValueAt(row, 5).toString());
+            
+            Object viTriObj = tableModel.getValueAt(row, 5);
+            if (viTriObj != null) {
+                String viTriStr = viTriObj.toString();
+                
+                // Kiểm tra nếu vị trí này chưa có trong ComboBox thì thêm tạm thời vào
+                boolean exists = false;
+                for (int i = 0; i < cbViTri.getItemCount(); i++) {
+                    if (viTriStr.equalsIgnoreCase(cbViTri.getItemAt(i))) {
+                        exists = true;
+                        break;
+                    }
+                }
+                if (!exists) {
+                    cbViTri.addItem(viTriStr);
+                }
+                cbViTri.setSelectedItem(viTriStr);
+            }
+
             txtGiaTien.setText(tableModel.getValueAt(row, 6).toString());
             txtHinhAnh.setText(tableModel.getValueAt(row, 7) != null ? tableModel.getValueAt(row, 7).toString() : "");
         }
@@ -243,8 +300,11 @@ public class ManagerView extends JFrame {
     }
 
     public void clearVehicleInfo() {
-        txtId.setText(""); txtBienSo.setText(""); txtLoaiXe.setText(""); txtMauXe.setText("");
-        txtNgayVao.setText(""); txtViTri.setText(""); txtGiaTien.setText(""); txtHinhAnh.setText("");
+        txtId.setText(""); txtBienSo.setText(""); 
+        if (cbLoaiXe.getItemCount() > 0) cbLoaiXe.setSelectedIndex(0);
+        txtMauXe.setText(""); txtNgayVao.setText(""); 
+        if (cbViTri.getItemCount() > 0) cbViTri.setSelectedIndex(0);
+        txtGiaTien.setText(""); txtHinhAnh.setText("");
     }
 
     public void chooseVehicleImage() {
@@ -302,5 +362,17 @@ public class ManagerView extends JFrame {
 
     public void addListVehicleSelectionListener(ListSelectionListener l) {
         tableVehicle.getSelectionModel().addListSelectionListener(l);
+    }
+
+    public void addParkingSlotChangeListener(ActionListener l) {
+        cbViTri.addActionListener(l);
+    }
+
+    public String getSelectedParkingSlot() {
+        return (String) cbViTri.getSelectedItem();
+    }
+
+    public void setGiaTienText(String giaTien) {
+        txtGiaTien.setText(giaTien);
     }
 }
