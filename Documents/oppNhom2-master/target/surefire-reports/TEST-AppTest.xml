@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="AppTest" time="0.031" tests="1" errors="0" skipped="0" failures="0">
+  <properties>
+    <property name="java.specification.version" value="25"/>
+    <property name="sun.cpu.isalist" value="amd64"/>
+    <property name="sun.jnu.encoding" value="Cp1252"/>
+    <property name="java.class.path" value="C:\Users\MY COMPUTER\Documents\oppNhom2-master\target\test-classes;C:\Users\MY COMPUTER\Documents\oppNhom2-master\target\classes;C:\Users\MY COMPUTER\.m2\repository\com\formdev\flatlaf\3.4\flatlaf-3.4.jar;C:\Users\MY COMPUTER\.m2\repository\jakarta\xml\bind\jakarta.xml.bind-api\2.3.3\jakarta.xml.bind-api-2.3.3.jar;C:\Users\MY COMPUTER\.m2\repository\jakarta\activation\jakarta.activation-api\1.2.2\jakarta.activation-api-1.2.2.jar;C:\Users\MY COMPUTER\.m2\repository\javax\xml\bind\jaxb-api\2.3.1\jaxb-api-2.3.1.jar;C:\Users\MY COMPUTER\.m2\repository\javax\activation\javax.activation-api\1.2.0\javax.activation-api-1.2.0.jar;C:\Users\MY COMPUTER\.m2\repository\com\sun\xml\bind\jaxb-impl\2.3.4\jaxb-impl-2.3.4.jar;C:\Users\MY COMPUTER\.m2\repository\com\sun\activation\jakarta.activation\1.2.2\jakarta.activation-1.2.2.jar;C:\Users\MY COMPUTER\.m2\repository\junit\junit\3.8.1\junit-3.8.1.jar;C:\Users\MY COMPUTER\.m2\repository\unknown\binary\KGradientPanel\SNAPSHOT\KGradientPanel-SNAPSHOT.jar;C:\Users\MY COMPUTER\.m2\repository\com\toedter\jcalendar\1.4\jcalendar-1.4.jar;C:\Users\MY COMPUTER\.m2\repository\unknown\binary\TimingFramework-0.55\SNAPSHOT\TimingFramework-0.55-SNAPSHOT.jar;C:\Users\MY COMPUTER\.m2\repository\unknown\binary\mysql-connector-java-5.1.23-bin\SNAPSHOT\mysql-connector-java-5.1.23-bin-SNAPSHOT.jar;"/>
+    <property name="java.vm.vendor" value="Eclipse Adoptium"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="user.variant" value=""/>
+    <property name="java.vendor.url" value="https://adoptium.net/"/>
+    <property name="user.timezone" value="Asia/Saigon"/>
+    <property name="os.name" value="Windows 11"/>
+    <property name="java.vm.specification.version" value="25"/>
+    <property name="user.country" value="US"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="sun.boot.library.path" value="D:\Apache NetBeans\jdk\bin"/>
+    <property name="sun.java.command" value="C:\Users\MY COMPUTER\AppData\Local\Temp\surefire9683285110078887870\surefirebooter-20260802185608595_3.jar C:\Users\MY COMPUTER\AppData\Local\Temp\surefire9683285110078887870 2026-08-02T18-56-07_295-jvmRun1 surefire-20260802185608595_1tmp surefire_0-20260802185608595_2tmp"/>
+    <property name="jdk.debug" value="release"/>
+    <property name="surefire.test.class.path" value="C:\Users\MY COMPUTER\Documents\oppNhom2-master\target\test-classes;C:\Users\MY COMPUTER\Documents\oppNhom2-master\target\classes;C:\Users\MY COMPUTER\.m2\repository\com\formdev\flatlaf\3.4\flatlaf-3.4.jar;C:\Users\MY COMPUTER\.m2\repository\jakarta\xml\bind\jakarta.xml.bind-api\2.3.3\jakarta.xml.bind-api-2.3.3.jar;C:\Users\MY COMPUTER\.m2\repository\jakarta\activation\jakarta.activation-api\1.2.2\jakarta.activation-api-1.2.2.jar;C:\Users\MY COMPUTER\.m2\repository\javax\xml\bind\jaxb-api\2.3.1\jaxb-api-2.3.1.jar;C:\Users\MY COMPUTER\.m2\repository\javax\activation\javax.activation-api\1.2.0\javax.activation-api-1.2.0.jar;C:\Users\MY COMPUTER\.m2\repository\com\sun\xml\bind\jaxb-impl\2.3.4\jaxb-impl-2.3.4.jar;C:\Users\MY COMPUTER\.m2\repository\com\sun\activation\jakarta.activation\1.2.2\jakarta.activation-1.2.2.jar;C:\Users\MY COMPUTER\.m2\repository\junit\junit\3.8.1\junit-3.8.1.jar;C:\Users\MY COMPUTER\.m2\repository\unknown\binary\KGradientPanel\SNAPSHOT\KGradientPanel-SNAPSHOT.jar;C:\Users\MY COMPUTER\.m2\repository\com\toedter\jcalendar\1.4\jcalendar-1.4.jar;C:\Users\MY COMPUTER\.m2\repository\unknown\binary\TimingFramework-0.55\SNAPSHOT\TimingFramework-0.55-SNAPSHOT.jar;C:\Users\MY COMPUTER\.m2\repository\unknown\binary\mysql-connector-java-5.1.23-bin\SNAPSHOT\mysql-connector-java-5.1.23-bin-SNAPSHOT.jar;"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="C:\Users\MY COMPUTER"/>
+    <property name="user.language" value="en"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.version.date" value="2026-01-20"/>
+    <property name="java.home" value="D:\Apache NetBeans\jdk"/>
+    <property name="file.separator" value="\"/>
+    <property name="basedir" value="C:\Users\MY COMPUTER\Documents\oppNhom2-master"/>
+    <property name="java.vm.compressedOopsMode" value="Zero based"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="surefire.real.class.path" value="C:\Users\MY COMPUTER\AppData\Local\Temp\surefire9683285110078887870\surefirebooter-20260802185608595_3.jar"/>
+    <property name="user.script" value=""/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="java.runtime.version" value="25.0.2+10-LTS"/>
+    <property name="user.name" value="MY COMPUTER"/>
+    <property name="stdout.encoding" value="Cp1252"/>
+    <property name="path.separator" value=";"/>
+    <property name="os.version" value="10.0"/>
+    <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/>
+    <property name="java.vendor.version" value="Temurin-25.0.2+10"/>
+    <property name="maven.ext.class.path" value="D:\Apache NetBeans\java\maven-nblib\netbeans-eventspy.jar"/>
+    <property name="localRepository" value="C:\Users\MY COMPUTER\.m2\repository"/>
+    <property name="java.vendor.url.bug" value="https://github.com/adoptium/adoptium-support/issues"/>
+    <property name="java.io.tmpdir" value="C:\Users\MY COMPUTER\AppData\Local\Temp\"/>
+    <property name="java.version" value="25.0.2"/>
+    <property name="user.dir" value="C:\Users\MY COMPUTER\Documents\oppNhom2-master"/>
+    <property name="os.arch" value="amd64"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="sun.os.patch.level" value=""/>
+    <property name="native.encoding" value="Cp1252"/>
+    <property name="java.library.path" value="D:\Apache NetBeans\jdk\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\Common Files\Intel\Shared Libraries\redist\intel64\compiler;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\dotnet\;D:\JAVA\bin;D:\json\;C:\Program Files\Git\cmd;C:\Program Files\MySQL\MySQL Shell 8.0\bin\;C:\Users\MY COMPUTER\AppData\Local\Microsoft\WindowsApps;C:\Users\MY COMPUTER\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\MY COMPUTER\AppData\Roaming\npm;D:\Apache NetBeans\bin\;."/>
+    <property name="java.vm.info" value="mixed mode, sharing"/>
+    <property name="stderr.encoding" value="Cp1252"/>
+    <property name="java.vendor" value="Eclipse Adoptium"/>
+    <property name="java.vm.version" value="25.0.2+10-LTS"/>
+    <property name="stdin.encoding" value="Cp1252"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="java.class.version" value="69.0"/>
+  </properties>
+  <testcase name="testApp" classname="AppTest" time="0.005"/>
+</testsuite>
