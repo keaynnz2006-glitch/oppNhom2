@@ -47,8 +47,10 @@ quanlybaixe\controller\VehicleDetailController$ClearVehicleListener.class
 quanlybaixe\controller\VehicleDetailController$ParkingSlotChangeListener.class
 quanlybaixe\controller\ParkingSlotController.class
 com\raven\chart\LabelColor.class
+quanlybaixe\view\DashboardView.class
 quanlybaixe\controller\ParkingSlotController$SearchParkingSlotListener.class
 quanlybaixe\utils\FileUtils.class
+quanlybaixe\controller\MainController$ChooseDashboardListener.class
 quanlybaixe\view\ManagerView.class
 quanlybaixe\controller\LoginController$LoginListener.class
 quanlybaixe\view\ParkingSlotView.class

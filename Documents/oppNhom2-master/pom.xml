@@ -5,6 +5,7 @@
     <artifactId>QuanLyBaiGuiXe</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
+    
     <repositories>
         <repository>
             <id>unknown-jars-temp-repo</id>
@@ -12,12 +13,23 @@
             <url>file:${project.basedir}/lib</url>
         </repository>
     </repositories>
+    
     <dependencies>
+        <!-- FlatLaf Look and Feel -->
         <dependency>
             <groupId>com.formdev</groupId>
             <artifactId>flatlaf</artifactId>
             <version>3.4</version>
         </dependency>
+        
+        <!-- JFreeChart (Thư viện vẽ biểu đồ) -->
+        <dependency>
+            <groupId>org.jfree</groupId>
+            <artifactId>jfreechart</artifactId>
+            <version>1.5.3</version>
+        </dependency>
+
+        <!-- XML Bind dependencies -->
         <dependency>
             <groupId>jakarta.xml.bind</groupId>
             <artifactId>jakarta.xml.bind-api</artifactId>
@@ -34,21 +46,27 @@
             <artifactId>jaxb-impl</artifactId>
             <version>2.3.4</version>
         </dependency>
+
+        <!-- JCalendar -->
+        <dependency>
+            <groupId>com.toedter</groupId>
+            <artifactId>jcalendar</artifactId>
+            <version>1.4</version>
+        </dependency>
+
+        <!-- Unit Tests -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>3.8.1</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- Local Jar Libraries -->
         <dependency>
             <groupId>unknown.binary</groupId>
             <artifactId>KGradientPanel</artifactId>
             <version>SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.toedter</groupId>
-            <artifactId>jcalendar</artifactId>
-            <version>1.4</version>
         </dependency>
         <dependency>
             <groupId>unknown.binary</groupId>
@@ -61,6 +79,7 @@
             <version>SNAPSHOT</version>
         </dependency>
     </dependencies>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>17</maven.compiler.source>
