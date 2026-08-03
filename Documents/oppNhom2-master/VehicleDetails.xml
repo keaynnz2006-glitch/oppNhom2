@@ -2,12 +2,32 @@
 <VehicleDetails>
     <VehicleDetail>
         <id>1</id>
-        <bienSo></bienSo>
+        <bienSo>29AF</bienSo>
         <loaiXe>Xe máy</loaiXe>
-        <mauXe></mauXe>
-        <ngayVaoBai>13:20 03/08/2026</ngayVaoBai>
+        <mauXe>CAM</mauXe>
+        <ngayVaoBai>13:57 03/08/2026</ngayVaoBai>
         <hinhAnh></hinhAnh>
         <viTriDo>A01</viTriDo>
+        <giaTien>5000.0</giaTien>
+    </VehicleDetail>
+    <VehicleDetail>
+        <id>2</id>
+        <bienSo>98FA</bienSo>
+        <loaiXe>Ô tô</loaiXe>
+        <mauXe>ĐEN</mauXe>
+        <ngayVaoBai>13:59 03/08/2026</ngayVaoBai>
+        <hinhAnh></hinhAnh>
+        <viTriDo>B01</viTriDo>
+        <giaTien>10000.0</giaTien>
+    </VehicleDetail>
+    <VehicleDetail>
+        <id>3</id>
+        <bienSo>20G</bienSo>
+        <loaiXe>Xe máy</loaiXe>
+        <mauXe>TRẮNG</mauXe>
+        <ngayVaoBai>14:02 03/08/2026</ngayVaoBai>
+        <hinhAnh></hinhAnh>
+        <viTriDo>A02</viTriDo>
         <giaTien>5000.0</giaTien>
     </VehicleDetail>
 </VehicleDetails>

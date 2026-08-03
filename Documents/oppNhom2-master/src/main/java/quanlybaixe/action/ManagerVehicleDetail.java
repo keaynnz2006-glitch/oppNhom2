@@ -13,6 +13,7 @@ import java.util.Locale;
 
 public class ManagerVehicleDetail {
     private static final String VEHICLE_DETAIL_FILE_NAME = "VehicleDetails.xml";
+    private static final String VEHICLE_HISTORY_FILE_NAME = "VehicleHistory.xml"; // File XML lưu lịch sử
     private List<VehicleDetail> listVehicleDetails;
 
     public ManagerVehicleDetail() {
@@ -35,6 +36,28 @@ public class ManagerVehicleDetail {
             list = xmlWrapper.getVehicleDetails();
         }
         return list;
+    }
+
+    // --- QUẢN LÝ LỊCH SỬ TRẢ XE ---
+    public void saveToHistory(VehicleDetail vehicle) {
+        if (vehicle != null) {
+            List<VehicleDetail> historyList = getHistoryVehicleDetails();
+            historyList.add(vehicle);
+            
+            // Ghi danh sách lịch sử cập nhật vào file VehicleHistory.xml
+            VehicleDetailXML xmlWrapper = new VehicleDetailXML();
+            xmlWrapper.setVehicleDetails(historyList);
+            FileUtils.writeXMLtoFile(VEHICLE_HISTORY_FILE_NAME, xmlWrapper);
+        }
+    }
+
+    public List<VehicleDetail> getHistoryVehicleDetails() {
+        List<VehicleDetail> historyList = new ArrayList<>();
+        VehicleDetailXML xmlWrapper = (VehicleDetailXML) FileUtils.readXMLFile(VEHICLE_HISTORY_FILE_NAME, VehicleDetailXML.class);
+        if (xmlWrapper != null && xmlWrapper.getVehicleDetails() != null) {
+            historyList = xmlWrapper.getVehicleDetails();
+        }
+        return historyList;
     }
     
     // Tìm kiếm xe theo Biển số xe

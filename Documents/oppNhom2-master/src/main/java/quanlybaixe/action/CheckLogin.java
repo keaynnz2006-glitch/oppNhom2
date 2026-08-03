@@ -9,7 +9,7 @@ import quanlybaixe.entity.User;
 public class CheckLogin {
     public boolean checkUser(User user) {
         if (user != null) {
-            // Sửa getUserName() thành getUsername() cho đúng với entity User
+          
             if ("admin".equals(user.getUsername()) 
                     && "admin".equals(user.getPassword())) {
                 return true;

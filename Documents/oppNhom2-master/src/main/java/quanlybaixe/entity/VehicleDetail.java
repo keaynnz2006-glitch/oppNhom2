@@ -21,6 +21,9 @@ public class VehicleDetail implements Serializable {
     @XmlJavaTypeAdapter(DateAdapter.class) 
     private Date ngayVaoBai;
 
+    @XmlJavaTypeAdapter(DateAdapter.class)
+    private Date ngayXuatBai; // Bổ sung thời gian xuất bãi
+
     private String hinhAnh;
     private String viTriDo;
     private double giaTien;
@@ -53,6 +56,10 @@ public class VehicleDetail implements Serializable {
 
     public Date getNgayVaoBai() { return ngayVaoBai; }
     public void setNgayVaoBai(Date ngayVaoBai) { this.ngayVaoBai = ngayVaoBai; }
+
+  
+    public Date getNgayXuatBai() { return ngayXuatBai; }
+    public void setNgayXuatBai(Date ngayXuatBai) { this.ngayXuatBai = ngayXuatBai; }
 
     public String getHinhAnh() { return hinhAnh; }
     public void setHinhAnh(String hinhAnh) { this.hinhAnh = hinhAnh; }

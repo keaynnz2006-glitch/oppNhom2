@@ -41,6 +41,7 @@ com\raven\chart\blankchart\BlankPlotChart.class
 quanlybaixe\action\ManagerVehicleDetail.class
 quanlybaixe\controller\VehicleDetailController$UndoListener.class
 quanlybaixe\controller\VehicleDetailController$SearchVehicleViewListener.class
+quanlybaixe\controller\VehicleDetailController$HistoryVehicleListener.class
 quanlybaixe\controller\MainController$ChooseVehicleDetailListener.class
 quanlybaixe\controller\VehicleDetailController$ClearVehicleListener.class
 quanlybaixe\controller\VehicleDetailController$ParkingSlotChangeListener.class
@@ -56,6 +57,7 @@ quanlybaixe\entity\VehicleDetailXML.class
 quanlybaixe\action\ManagerVehicleDetail$2.class
 quanlybaixe\controller\VehicleDetailController$StatisticClearListener.class
 quanlybaixe\entity\User.class
+quanlybaixe\view\HistoryView.class
 quanlybaixe\controller\VehicleDetailController$AddVehicleListener.class
 quanlybaixe\view\MainView.class
 quanlybaixe\action\ManagerParkingSlot$1.class

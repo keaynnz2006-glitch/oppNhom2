@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<VehicleDetails>
+    <VehicleDetail>
+        <id>1</id>
+        <bienSo></bienSo>
+        <loaiXe>Xe máy</loaiXe>
+        <mauXe></mauXe>
+        <ngayVaoBai>13:20 03/08/2026</ngayVaoBai>
+        <hinhAnh></hinhAnh>
+        <viTriDo>A01</viTriDo>
+        <giaTien>5000.0</giaTien>
+    </VehicleDetail>
+    <VehicleDetail>
+        <id>1</id>
+        <bienSo></bienSo>
+        <loaiXe>Xe máy</loaiXe>
+        <mauXe></mauXe>
+        <ngayVaoBai>13:48 03/08/2026</ngayVaoBai>
+        <ngayXuatBai>13:49 03/08/2026</ngayXuatBai>
+        <hinhAnh></hinhAnh>
+        <viTriDo>A01</viTriDo>
+        <giaTien>5000.0</giaTien>
+    </VehicleDetail>
+    <VehicleDetail>
+        <id>4</id>
+        <bienSo>343A</bienSo>
+        <loaiXe>Ô tô</loaiXe>
+        <mauXe>HỒNG</mauXe>
+        <ngayVaoBai>14:28 03/08/2026</ngayVaoBai>
+        <ngayXuatBai>14:29 03/08/2026</ngayXuatBai>
+        <hinhAnh></hinhAnh>
+        <viTriDo>B03</viTriDo>
+        <giaTien>10000.0</giaTien>
+    </VehicleDetail>
+</VehicleDetails>

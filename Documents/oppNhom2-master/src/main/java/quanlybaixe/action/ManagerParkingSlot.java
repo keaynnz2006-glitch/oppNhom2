@@ -63,7 +63,7 @@ public class ManagerParkingSlot {
         return temp;
     }
     
-    // --- THAO TÁC CRUD ---
+    // crud
 
     public void add(ParkingSlot slot) {
         int max = 0;
