@@ -14,6 +14,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -30,6 +31,7 @@ public class VehicleDetailController {
         
         view.addAddVehicleListener(new AddVehicleListener());
         view.addEditVehicleListener(new EditVehicleListener());
+        view.addCheckoutVehicleListener(new CheckoutVehicleListener());
         view.addClearListener(new ClearVehicleListener());
         view.addDeleteVehicleListener(new DeleteVehicleListener());
         view.addListVehicleSelectionListener(new ListVehicleSelectionListener());
@@ -46,20 +48,64 @@ public class VehicleDetailController {
         view.addStatisticTypeListener(new StatisticVehicleTypeListener());
         view.addStatisticClearListener(new StatisticClearListener());
 
-        // Lắng nghe đổi vị trí đỗ để hiện giá tiền
         view.addParkingSlotChangeListener(new ParkingSlotChangeListener());
     }
 
     public void showManagerView() {
-        // ĐÚNG: Nạp CHỈ danh sách vị trí đỗ CÒN TRỐNG vào ComboBox
-        List<ParkingSlot> availableSlots = managerParkingSlot.getAvailableParkingSlots();
-        managerView.setParkingSlotList(availableSlots);
+        // Lấy tất cả ô đỗ để ManagerView tự quản lý lọc & hiển thị
+        List<ParkingSlot> allSlots = managerParkingSlot.getListParkingSlots();
+        managerView.setParkingSlotList(allSlots);
 
-        // Nạp danh sách xe
         List<VehicleDetail> vehicleList = managerVehicleDetail.getListVehicleDetails();
         managerView.setVisible(true);
         managerView.showListVehicles(vehicleList);
         managerView.showCountListVehicles(vehicleList);
+    }
+
+    // Xử lý logic TRẢ XE THEO LƯỢT
+    class CheckoutVehicleListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            VehicleDetail vehicle = managerView.getVehicleInfo();
+            if (vehicle == null || vehicle.getId() == 0) {
+                managerView.showMessage("Vui lòng chọn xe cần trả từ bảng!");
+                return;
+            }
+
+            double tongTien = vehicle.getGiaTien();
+
+            String confirmMsg = String.format(
+                "XÁC NHẬN TRẢ XE (THEO LƯỢT)\n" +
+                "-----------------------------------\n" +
+                "Biển số: %s\n" +
+                "Vị trí đỗ: %s\n" +
+                "THÀNH TIỀN (1 LƯỢT): %,.0f VNĐ\n\n" +
+                "Xác nhận thanh toán và cho xe xuất bãi?",
+                vehicle.getBienSo(), vehicle.getViTriDo(), tongTien
+            );
+
+            int confirm = JOptionPane.showConfirmDialog(
+                managerView, confirmMsg, "Xác Nhận Trả Xe", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE
+            );
+
+            if (confirm == JOptionPane.YES_OPTION) {
+                if (vehicle.getViTriDo() != null && !vehicle.getViTriDo().isEmpty()) {
+                    managerParkingSlot.updateSlotStatus(vehicle.getViTriDo(), false);
+                }
+
+                managerVehicleDetail.delete(vehicle);
+
+                // Cập nhật giao diện & Làm mới form
+                managerView.clearVehicleInfo();
+                managerView.showListVehicles(managerVehicleDetail.getListVehicleDetails());
+                managerView.showCountListVehicles(managerVehicleDetail.getListVehicleDetails());
+                
+                // Cập nhật lại toàn bộ danh sách ô đỗ
+                managerView.setParkingSlotList(managerParkingSlot.getListParkingSlots());
+
+                managerView.showMessage("Trả xe thành công! Đã thu: " + String.format("%,.0f VNĐ", tongTien));
+            }
+        }
     }
 
     class ParkingSlotChangeListener implements ActionListener {
@@ -84,17 +130,20 @@ public class VehicleDetailController {
             if (vehicle != null) {
                 managerVehicleDetail.add(vehicle);
                 
-                // Cập nhật vị trí đỗ thành ĐÃ CÓ XE (true)
                 if (vehicle.getViTriDo() != null && !vehicle.getViTriDo().isEmpty()) {
                     managerParkingSlot.updateSlotStatus(vehicle.getViTriDo(), true);
                 }
 
-                managerView.showVehicle(vehicle);
+                // Cập nhật lại bảng và đếm số lượng
                 managerView.showListVehicles(managerVehicleDetail.getListVehicleDetails());
                 managerView.showCountListVehicles(managerVehicleDetail.getListVehicleDetails());
                 
-                // ĐÚNG: Cập nhật lại ComboBox CHỈ NẠP CÁC Ô CÒN TRỐNG
-                managerView.setParkingSlotList(managerParkingSlot.getAvailableParkingSlots());
+                // Cập nhật danh sách ô đỗ
+                managerView.setParkingSlotList(managerParkingSlot.getListParkingSlots());
+                
+                // Tự động dọn sạch form nhập liệu sau khi thêm
+                managerView.clearVehicleInfo();
+                
                 managerView.showMessage("Thêm thông tin xe thành công!");
             }
         }
@@ -105,7 +154,6 @@ public class VehicleDetailController {
             VehicleDetail vehicle = managerView.getVehicleInfo();
             if (vehicle != null) {
                 try {
-                    // Lấy thông tin cũ trước khi sửa để kiểm tra vị trí đỗ
                     VehicleDetail oldVehicle = null;
                     for (VehicleDetail v : managerVehicleDetail.getListVehicleDetails()) {
                         if (v.getId() == vehicle.getId()) {
@@ -114,12 +162,9 @@ public class VehicleDetailController {
                         }
                     }
 
-                    // Nếu có sự thay đổi vị trí đỗ
                     if (oldVehicle != null && oldVehicle.getViTriDo() != null 
                             && !oldVehicle.getViTriDo().equalsIgnoreCase(vehicle.getViTriDo())) {
-                        // Trả vị trí cũ về TRỐNG (false)
                         managerParkingSlot.updateSlotStatus(oldVehicle.getViTriDo(), false);
-                        // Đánh dấu vị trí mới là ĐÃ CÓ XE (true)
                         if (vehicle.getViTriDo() != null && !vehicle.getViTriDo().isEmpty()) {
                             managerParkingSlot.updateSlotStatus(vehicle.getViTriDo(), true);
                         }
@@ -130,12 +175,15 @@ public class VehicleDetailController {
                     Logger.getLogger(VehicleDetailController.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 
-                managerView.showVehicle(vehicle);
                 managerView.showListVehicles(managerVehicleDetail.getListVehicleDetails());
                 managerView.showCountListVehicles(managerVehicleDetail.getListVehicleDetails());
                 
-                // ĐÚNG: Cập nhật lại ComboBox CHỈ NẠP CÁC Ô CÒN TRỐNG
-                managerView.setParkingSlotList(managerParkingSlot.getAvailableParkingSlots());
+                // Cập nhật danh sách ô đỗ
+                managerView.setParkingSlotList(managerParkingSlot.getListParkingSlots());
+                
+                // Tự động dọn sạch form nhập liệu sau khi sửa
+                managerView.clearVehicleInfo();
+                
                 managerView.showMessage("Cập nhật thông tin xe thành công!");
             }
         }
@@ -147,7 +195,6 @@ public class VehicleDetailController {
             if (vehicle != null) {
                 managerVehicleDetail.delete(vehicle);
 
-                // Trả vị trí đỗ về TRỐNG (false)
                 if (vehicle.getViTriDo() != null && !vehicle.getViTriDo().isEmpty()) {
                     managerParkingSlot.updateSlotStatus(vehicle.getViTriDo(), false);
                 }
@@ -156,8 +203,8 @@ public class VehicleDetailController {
                 managerView.showListVehicles(managerVehicleDetail.getListVehicleDetails());
                 managerView.showCountListVehicles(managerVehicleDetail.getListVehicleDetails());
                 
-                // ĐÚNG: Cập nhật lại ComboBox CHỈ NẠP CÁC Ô CÒN TRỐNG (ô vừa giải phóng sẽ xuất hiện lại)
-                managerView.setParkingSlotList(managerParkingSlot.getAvailableParkingSlots());
+                // Cập nhật lại toàn bộ danh sách ô đỗ
+                managerView.setParkingSlotList(managerParkingSlot.getListParkingSlots());
                 managerView.showMessage("Xóa thông tin xe thành công!");
             }
         }
@@ -246,7 +293,7 @@ public class VehicleDetailController {
             mainView = new MainView();
             MainController mainController = new MainController(mainView);
             mainController.showMainView();
-            managerView.dispose(); // Đóng cửa sổ hiện tại giải phóng bộ nhớ
+            managerView.dispose();
         }
     }
 

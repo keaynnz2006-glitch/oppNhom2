@@ -1,6 +1,7 @@
 quanlybaixe\controller\VehicleDetailController$CancelDialogSearchVehicleListener.class
 quanlybaixe\controller\VehicleDetailController$SortVehicleIDListener.class
 com\raven\chart\Chart$2.class
+quanlybaixe\controller\VehicleDetailController$CheckoutVehicleListener.class
 quanlybaixe\entity\ParkingSlotXML.class
 quanlybaixe\action\ManagerVehicleDetail$3.class
 com\raven\chart\blankchart\BlankPlotChatRender.class

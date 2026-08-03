@@ -32,4 +32,12 @@
         <trangThai>false</trangThai>
         <ghiChu></ghiChu>
     </ParkingSlot>
+    <ParkingSlot>
+        <id>5</id>
+        <tenViTri>A03</tenViTri>
+        <loaiSlot>Xe máy</loaiSlot>
+        <giaTien>5000.0</giaTien>
+        <trangThai>false</trangThai>
+        <ghiChu></ghiChu>
+    </ParkingSlot>
 </ParkingSlots>

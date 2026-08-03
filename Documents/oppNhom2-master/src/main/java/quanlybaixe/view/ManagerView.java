@@ -5,10 +5,12 @@ import quanlybaixe.entity.VehicleDetail;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -18,30 +20,32 @@ import java.util.stream.Collectors;
 
 public class ManagerView extends JFrame {
 
-    private JTextField txtId, txtBienSo, txtMauXe, txtNgayVao, txtGiaTien, txtHinhAnh;
-    private JComboBox<String> cbLoaiXe, cbViTri;
-    private JLabel lblTotalCount, lblImagePreview, lblStatistic;
+    private JTextField txtId, txtBienSo, txtMauXe, txtNgayVao, txtGiaTien, txtHinhAnh, txtViTriSelected;
+    private JComboBox<String> cbLoaiXe;
+    private JButton btnSelectSlot;
+    private JLabel lblTotalCount, lblStatistic;
     private JRadioButton rdoSearchBienSo, rdoSearchLoaiXe, rdoSearchMauXe;
     private ButtonGroup bgSearch;
     private JTextField txtSearchInput;
 
-    private JButton btnAdd, btnEdit, btnDelete, btnClear, btnSortId, btnSortBienSo, btnSortNgay, btnSearch, btnCancelSearch, btnChooseImg, btnUndo, btnStatistic, btnStatisticType, btnStatisticClear;
+    private JButton btnAdd, btnEdit, btnDelete, btnCheckout, btnClear, btnSortId, btnSortBienSo, btnSortNgay, btnSearch, btnCancelSearch, btnChooseImg, btnUndo, btnStatistic, btnStatisticType, btnStatisticClear;
 
     private JTable tableVehicle;
     private DefaultTableModel tableModel;
-    private JDialog searchDialog, statisticDialog;
+    private JDialog searchDialog, statisticDialog, slotPickerDialog;
 
-    // Khai báo định dạng ngày giờ chuẩn
+    private List<ParkingSlot> currentParkingSlots; // Lưu danh sách ô đỗ hiện tại
     private final SimpleDateFormat dateTimeFormat = new SimpleDateFormat("HH:mm dd/MM/yyyy");
+    private final DecimalFormat priceFormat = new DecimalFormat("#,###"); // Định dạng tiền ví dụ: 5,000
 
     public ManagerView() {
         setTitle("Quản Lý Chi Tiết Xe Trong Bãi");
-        setSize(1100, 700);
+        setSize(1150, 700);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout(10, 10));
 
-        // Header
+        // Header Panel
         JPanel panelTitle = new JPanel();
         panelTitle.setBackground(new Color(41, 128, 185));
         JLabel lblTitle = new JLabel("QUẢN LÝ CHI TIẾT XE RA VÀO BÃI");
@@ -50,7 +54,7 @@ public class ManagerView extends JFrame {
         panelTitle.add(lblTitle);
         add(panelTitle, BorderLayout.NORTH);
 
-        // Form Panel (Left)
+        // Form Panel (Bên trái)
         JPanel panelForm = new JPanel(new GridBagLayout());
         panelForm.setBorder(BorderFactory.createTitledBorder("Thông tin xe"));
         GridBagConstraints gbc = new GridBagConstraints();
@@ -65,13 +69,20 @@ public class ManagerView extends JFrame {
 
         txtMauXe = new JTextField(15);
         
-        // CẬP NHẬT: Tự động điền ngày giờ hiện tại & Không cho gõ tay thủ công
         txtNgayVao = new JTextField(15);
         txtNgayVao.setEditable(false);
         txtNgayVao.setText(dateTimeFormat.format(new Date()));
         
-        cbViTri = new JComboBox<>();
-        
+        // Ô vị trí đỗ: Ô chữ + Nút bấm chọn từ Sơ đồ
+        txtViTriSelected = new JTextField(10);
+        txtViTriSelected.setEditable(false);
+        btnSelectSlot = new JButton("Chọn vị trí");
+        btnSelectSlot.addActionListener(e -> showSlotPickerDialog());
+
+        JPanel panelSlotInput = new JPanel(new BorderLayout(5, 0));
+        panelSlotInput.add(txtViTriSelected, BorderLayout.CENTER);
+        panelSlotInput.add(btnSelectSlot, BorderLayout.EAST);
+
         txtGiaTien = new JTextField(15);
         txtHinhAnh = new JTextField(10); txtHinhAnh.setEditable(false);
 
@@ -84,32 +95,37 @@ public class ManagerView extends JFrame {
         addFormField(panelForm, gbc, 1, "Biển số xe:", txtBienSo);
         addFormField(panelForm, gbc, 2, "Loại xe:", cbLoaiXe);
         addFormField(panelForm, gbc, 3, "Màu xe:", txtMauXe);
-        addFormField(panelForm, gbc, 4, "Thời gian vào (HH:mm dd/MM/yyyy):", txtNgayVao);
-        addFormField(panelForm, gbc, 5, "Vị trí đỗ:", cbViTri);
+        addFormField(panelForm, gbc, 4, "Thời gian vào:", txtNgayVao);
+        addFormField(panelForm, gbc, 5, "Vị trí đỗ:", panelSlotInput);
         addFormField(panelForm, gbc, 6, "Giá tiền:", txtGiaTien);
         addFormField(panelForm, gbc, 7, "Hình ảnh:", panelImgInput);
 
-        // Buttons
-        JPanel panelBtns = new JPanel(new GridLayout(3, 3, 4, 4));
+        // Nút chức năng
+        JPanel panelBtns = new JPanel(new GridLayout(4, 2, 4, 4));
         btnAdd = new JButton("Thêm");
         btnEdit = new JButton("Sửa");
+        btnCheckout = new JButton("Trả xe");
         btnDelete = new JButton("Xóa");
         btnClear = new JButton("Làm mới");
         btnUndo = new JButton("Quay lại");
         btnStatistic = new JButton("Thống kê");
 
-        panelBtns.add(btnAdd); panelBtns.add(btnEdit); panelBtns.add(btnDelete);
-        panelBtns.add(btnClear); panelBtns.add(btnStatistic); panelBtns.add(btnUndo);
+        panelBtns.add(btnAdd); 
+        panelBtns.add(btnEdit); 
+        panelBtns.add(btnCheckout);
+        panelBtns.add(btnDelete);
+        panelBtns.add(btnClear); 
+        panelBtns.add(btnStatistic); 
+        panelBtns.add(btnUndo);
 
         gbc.gridx = 0; gbc.gridy = 8; gbc.gridwidth = 2;
         panelForm.add(panelBtns, gbc);
 
         add(panelForm, BorderLayout.WEST);
 
-        // Right Panel
+        // Panel bên phải (Công cụ & Bảng dữ liệu)
         JPanel panelRight = new JPanel(new BorderLayout(5, 5));
 
-        // Tools (Sort & Search)
         JPanel panelTools = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panelTools.setBorder(BorderFactory.createTitledBorder("Công cụ"));
 
@@ -127,13 +143,19 @@ public class ManagerView extends JFrame {
 
         panelRight.add(panelTools, BorderLayout.NORTH);
 
-        // Table
+        // Bảng danh sách xe
         String[] columns = {"ID", "Biển Số", "Loại Xe", "Màu Xe", "Thời Gian Vào", "Vị Trí", "Giá Tiền", "Hình Ảnh"};
         tableModel = new DefaultTableModel(columns, 0);
         tableVehicle = new JTable(tableModel);
+        
+        // Căn phải cột giá tiền trên bảng cho đẹp
+        DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
+        rightRenderer.setHorizontalAlignment(JLabel.RIGHT);
+        tableVehicle.getColumnModel().getColumn(6).setCellRenderer(rightRenderer);
+
         panelRight.add(new JScrollPane(tableVehicle), BorderLayout.CENTER);
 
-        // Status
+        // Thống kê tổng số
         lblTotalCount = new JLabel("Tổng số xe trong bãi: 0");
         lblTotalCount.setFont(new Font("Segoe UI", Font.BOLD, 14));
         JPanel panelFooter = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -151,6 +173,95 @@ public class ManagerView extends JFrame {
         p.add(new JLabel(label), gbc);
         gbc.gridx = 1;
         p.add(comp, gbc);
+    }
+
+    // Hiển thị Dialog sơ đồ bãi xe phân chia theo Tab
+    private void showSlotPickerDialog() {
+        if (currentParkingSlots == null || currentParkingSlots.isEmpty()) {
+            showMessage("Không có dữ liệu vị trí đỗ!");
+            return;
+        }
+
+        slotPickerDialog = new JDialog(this, "Sơ Đồ Chọn Vị Trí Đỗ Theo Khu", true);
+        slotPickerDialog.setSize(600, 450);
+        slotPickerDialog.setLocationRelativeTo(this);
+        slotPickerDialog.setLayout(new BorderLayout(10, 10));
+
+        // Ghi chú màu sắc
+        JPanel panelLegend = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 5));
+        JLabel lblGreen = new JLabel(" GREEN: Vị trí trống ");
+        lblGreen.setOpaque(true); 
+        lblGreen.setBackground(new Color(46, 204, 113)); 
+        lblGreen.setForeground(Color.WHITE);
+
+        JLabel lblRed = new JLabel(" RED: Đã có xe ");
+        lblRed.setOpaque(true); 
+        lblRed.setBackground(new Color(231, 76, 60)); 
+        lblRed.setForeground(Color.WHITE);
+
+        panelLegend.add(lblGreen); 
+        panelLegend.add(lblRed);
+        slotPickerDialog.add(panelLegend, BorderLayout.NORTH);
+
+        // Phân loại ô đỗ theo Tên Khu (A, B, C...)
+        Map<String, List<ParkingSlot>> groupedSlots = currentParkingSlots.stream()
+                .collect(Collectors.groupingBy(slot -> {
+                    String name = slot.getTenViTri() != null ? slot.getTenViTri().trim() : "Khác";
+                    if (name.contains("-")) {
+                        return name.split("-")[0].trim();
+                    } else if (name.matches("^[a-zA-Z]+.*")) {
+                        return "Khu " + name.substring(0, 1).toUpperCase();
+                    }
+                    return "Khu Khác";
+                }));
+
+        JTabbedPane tabbedPane = new JTabbedPane();
+
+        groupedSlots.forEach((zoneName, slotsInZone) -> {
+            JPanel panelGrid = new JPanel(new GridLayout(0, 5, 8, 8));
+            panelGrid.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+            for (ParkingSlot slot : slotsInZone) {
+                JButton btnSlot = new JButton(slot.getTenViTri());
+                btnSlot.setFont(new Font("Segoe UI", Font.BOLD, 12));
+                btnSlot.setFocusPainted(false);
+                btnSlot.setOpaque(true);
+                btnSlot.setContentAreaFilled(true);
+                btnSlot.setBorder(BorderFactory.createLineBorder(Color.WHITE, 1));
+
+                if (slot.isTrangThai()) {
+                    // MÀU ĐỎ: Đã có xe
+                    btnSlot.setBackground(new Color(231, 76, 60)); 
+                    btnSlot.setForeground(Color.WHITE);
+                    btnSlot.addActionListener(e -> showMessage("Vị trí này đã có xe đỗ!"));
+                } else {
+                    // MÀU XANH: Trống
+                    btnSlot.setBackground(new Color(46, 204, 113)); 
+                    btnSlot.setForeground(Color.WHITE);
+                    btnSlot.addActionListener(e -> {
+                        // 1. Gán vị trí đỗ được chọn
+                        txtViTriSelected.setText(slot.getTenViTri());
+                        
+                        // 2. TỰ ĐỘNG CẬP NHẬT GIÁ TIỀN TỪ PARKINGSLOT SANG FORM (Đã format ví dụ 5,000)
+                        txtGiaTien.setText(priceFormat.format(slot.getGiaTien()));
+                        
+                        // 3. Tự động chuyển ComboBox loại xe nếu slot có quy định loại xe
+                        if (slot.getLoaiSlot() != null && !slot.getLoaiSlot().isEmpty()) {
+                            cbLoaiXe.setSelectedItem(slot.getLoaiSlot());
+                        }
+
+                        slotPickerDialog.dispose();
+                    });
+                }
+                panelGrid.add(btnSlot);
+            }
+
+            JScrollPane scrollPane = new JScrollPane(panelGrid);
+            tabbedPane.addTab(zoneName, scrollPane);
+        });
+
+        slotPickerDialog.add(tabbedPane, BorderLayout.CENTER);
+        slotPickerDialog.setVisible(true);
     }
 
     private void initSearchDialog() {
@@ -191,12 +302,7 @@ public class ManagerView extends JFrame {
     }
 
     public void setParkingSlotList(List<ParkingSlot> listSlot) {
-        cbViTri.removeAllItems();
-        if (listSlot != null) {
-            for (ParkingSlot slot : listSlot) {
-                cbViTri.addItem(slot.getTenViTri());
-            }
-        }
+        this.currentParkingSlots = listSlot;
     }
 
     public VehicleDetail getVehicleInfo() {
@@ -206,17 +312,18 @@ public class ManagerView extends JFrame {
             String loaiXe = (String) cbLoaiXe.getSelectedItem();
             String mauXe = txtMauXe.getText();
 
-            // Đọc ngày giờ theo chuẩn HH:mm dd/MM/yyyy
             Date ngayVao = txtNgayVao.getText().isEmpty() ? new Date() : dateTimeFormat.parse(txtNgayVao.getText());
-
-            String viTri = (String) cbViTri.getSelectedItem();
+            String viTri = txtViTriSelected.getText();
             
-            double giaTien = txtGiaTien.getText().isEmpty() ? 0.0 : Double.parseDouble(txtGiaTien.getText());
+            // Xử lý đọc giá tiền (loại bỏ dấu phẩy/chấm nếu người dùng gõ vào)
+            String rawGiaTien = txtGiaTien.getText().replaceAll("[,.]", "").trim();
+            double giaTien = rawGiaTien.isEmpty() ? 0.0 : Double.parseDouble(rawGiaTien);
+            
             String hinhAnh = txtHinhAnh.getText();
 
             return new VehicleDetail(id, bienSo, loaiXe, mauXe, ngayVao, hinhAnh, viTri, giaTien);
         } catch (Exception ex) {
-            showMessage("Dữ liệu không hợp lệ! Vui lòng kiểm tra lại Ngày/Giá tiền.");
+            showMessage("Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.");
             return null;
         }
     }
@@ -224,30 +331,13 @@ public class ManagerView extends JFrame {
     public void showVehicle(VehicleDetail v) {
         txtId.setText(String.valueOf(v.getId()));
         txtBienSo.setText(v.getBienSo());
-        
-        if (v.getLoaiXe() != null) {
-            cbLoaiXe.setSelectedItem(v.getLoaiXe());
-        }
-        
+        if (v.getLoaiXe() != null) cbLoaiXe.setSelectedItem(v.getLoaiXe());
         txtMauXe.setText(v.getMauXe());
-
         txtNgayVao.setText(v.getNgayVaoBai() != null ? dateTimeFormat.format(v.getNgayVaoBai()) : dateTimeFormat.format(new Date()));
-
-        if (v.getViTriDo() != null) {
-            boolean exists = false;
-            for (int i = 0; i < cbViTri.getItemCount(); i++) {
-                if (v.getViTriDo().equalsIgnoreCase(cbViTri.getItemAt(i))) {
-                    exists = true;
-                    break;
-                }
-            }
-            if (!exists) {
-                cbViTri.addItem(v.getViTriDo());
-            }
-            cbViTri.setSelectedItem(v.getViTriDo());
-        }
+        txtViTriSelected.setText(v.getViTriDo() != null ? v.getViTriDo() : "");
         
-        txtGiaTien.setText(String.valueOf(v.getGiaTien()));
+        // Format hiển thị giá tiền
+        txtGiaTien.setText(priceFormat.format(v.getGiaTien()));
         txtHinhAnh.setText(v.getHinhAnh());
     }
 
@@ -257,7 +347,9 @@ public class ManagerView extends JFrame {
             tableModel.addRow(new Object[]{
                 v.getId(), v.getBienSo(), v.getLoaiXe(), v.getMauXe(),
                 v.getNgayVaoBai() != null ? dateTimeFormat.format(v.getNgayVaoBai()) : "",
-                v.getViTriDo(), v.getGiaTien(), v.getHinhAnh()
+                v.getViTriDo(), 
+                priceFormat.format(v.getGiaTien()), // Định dạng trên bảng
+                v.getHinhAnh()
             });
         }
     }
@@ -269,31 +361,22 @@ public class ManagerView extends JFrame {
             txtBienSo.setText(tableModel.getValueAt(row, 1).toString());
             
             Object loaiXeObj = tableModel.getValueAt(row, 2);
-            if (loaiXeObj != null) {
-                cbLoaiXe.setSelectedItem(loaiXeObj.toString());
-            }
+            if (loaiXeObj != null) cbLoaiXe.setSelectedItem(loaiXeObj.toString());
 
             txtMauXe.setText(tableModel.getValueAt(row, 3).toString());
             txtNgayVao.setText(tableModel.getValueAt(row, 4).toString());
             
             Object viTriObj = tableModel.getValueAt(row, 5);
-            if (viTriObj != null) {
-                String viTriStr = viTriObj.toString();
-                
-                boolean exists = false;
-                for (int i = 0; i < cbViTri.getItemCount(); i++) {
-                    if (viTriStr.equalsIgnoreCase(cbViTri.getItemAt(i))) {
-                        exists = true;
-                        break;
-                    }
-                }
-                if (!exists) {
-                    cbViTri.addItem(viTriStr);
-                }
-                cbViTri.setSelectedItem(viTriStr);
+            txtViTriSelected.setText(viTriObj != null ? viTriObj.toString() : "");
+
+            // Lấy giá tiền từ bảng đổ ra ô Giá tiền
+            Object giaTienObj = tableModel.getValueAt(row, 6);
+            if (giaTienObj != null) {
+                txtGiaTien.setText(giaTienObj.toString());
+            } else {
+                txtGiaTien.setText("0");
             }
 
-            txtGiaTien.setText(tableModel.getValueAt(row, 6).toString());
             txtHinhAnh.setText(tableModel.getValueAt(row, 7) != null ? tableModel.getValueAt(row, 7).toString() : "");
         }
     }
@@ -303,15 +386,22 @@ public class ManagerView extends JFrame {
     }
 
     public void clearVehicleInfo() {
-        txtId.setText(""); txtBienSo.setText(""); 
+        txtId.setText(""); 
+        txtBienSo.setText(""); 
         if (cbLoaiXe.getItemCount() > 0) cbLoaiXe.setSelectedIndex(0);
         txtMauXe.setText(""); 
         
-        // CẬP NHẬT: Reset lại thời gian hiện tại mỗi khi ấn "Làm mới"
+        // Cập nhật lại thời gian theo giờ thực tế hiện tại
         txtNgayVao.setText(dateTimeFormat.format(new Date())); 
         
-        if (cbViTri.getItemCount() > 0) cbViTri.setSelectedIndex(0);
-        txtGiaTien.setText(""); txtHinhAnh.setText("");
+        txtViTriSelected.setText("");
+        txtGiaTien.setText(""); 
+        txtHinhAnh.setText("");
+
+        // Bỏ chọn dòng đang Highlight trên bảng (nếu có)
+        if (tableVehicle != null) {
+            tableVehicle.clearSelection();
+        }
     }
 
     public void chooseVehicleImage() {
@@ -349,19 +439,13 @@ public class ManagerView extends JFrame {
 
     public void showMessage(String msg) { JOptionPane.showMessageDialog(this, msg); }
 
-    // --- BỔ SUNG: Lấy loại xe đang chọn trên UI ---
-    public String getSelectedLoaiXe() {
-        return (String) cbLoaiXe.getSelectedItem();
-    }
-
-    // --- BỔ SUNG: Lắng nghe sự kiện thay đổi Loại xe ---
-    public void addLoaiXeChangeListener(ActionListener l) {
-        cbLoaiXe.addActionListener(l);
-    }
+    public String getSelectedLoaiXe() { return (String) cbLoaiXe.getSelectedItem(); }
+    public void addLoaiXeChangeListener(ActionListener l) { cbLoaiXe.addActionListener(l); }
 
     // --- ADD LISTENERS ---
     public void addAddVehicleListener(ActionListener l) { btnAdd.addActionListener(l); }
     public void addEditVehicleListener(ActionListener l) { btnEdit.addActionListener(l); }
+    public void addCheckoutVehicleListener(ActionListener l) { btnCheckout.addActionListener(l); }
     public void addDeleteVehicleListener(ActionListener l) { btnDelete.addActionListener(l); }
     public void addClearListener(ActionListener l) { btnClear.addActionListener(l); }
     public void addImageVehicleListener(ActionListener l) { btnChooseImg.addActionListener(l); }
@@ -381,15 +465,16 @@ public class ManagerView extends JFrame {
         tableVehicle.getSelectionModel().addListSelectionListener(l);
     }
 
-    public void addParkingSlotChangeListener(ActionListener l) {
-        cbViTri.addActionListener(l);
-    }
+    public void addParkingSlotChangeListener(ActionListener l) {}
 
-    public String getSelectedParkingSlot() {
-        return (String) cbViTri.getSelectedItem();
-    }
+    public String getSelectedParkingSlot() { return txtViTriSelected.getText(); }
 
-    public void setGiaTienText(String giaTien) {
-        txtGiaTien.setText(giaTien);
+    public void setGiaTienText(String giaTien) { 
+        try {
+            double val = Double.parseDouble(giaTien);
+            txtGiaTien.setText(priceFormat.format(val));
+        } catch (Exception e) {
+            txtGiaTien.setText(giaTien);
+        }
     }
 }
