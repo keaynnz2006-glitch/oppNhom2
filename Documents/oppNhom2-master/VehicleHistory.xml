@@ -43,4 +43,26 @@
         <viTriDo>B01</viTriDo>
         <giaTien>10000.0</giaTien>
     </VehicleDetail>
+    <VehicleDetail>
+        <id>4</id>
+        <bienSo>24</bienSo>
+        <loaiXe>Xe máy</loaiXe>
+        <mauXe>CK</mauXe>
+        <ngayVaoBai>16:02 03/08/2026</ngayVaoBai>
+        <ngayXuatBai>06:12 04/08/2026</ngayXuatBai>
+        <hinhAnh></hinhAnh>
+        <viTriDo>A03</viTriDo>
+        <giaTien>5000.0</giaTien>
+    </VehicleDetail>
+    <VehicleDetail>
+        <id>6</id>
+        <bienSo>72AA</bienSo>
+        <loaiXe>Xe máy</loaiXe>
+        <mauXe>ĐỎ</mauXe>
+        <ngayVaoBai>06:29 04/08/2026</ngayVaoBai>
+        <ngayXuatBai>06:36 04/08/2026</ngayXuatBai>
+        <hinhAnh></hinhAnh>
+        <viTriDo>A03</viTriDo>
+        <giaTien>5000.0</giaTien>
+    </VehicleDetail>
 </VehicleDetails>

@@ -16,9 +16,10 @@ import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javax.swing.BorderFactory;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -50,19 +51,20 @@ public class VehicleDetailController {
         view.addDeleteVehicleListener(new DeleteVehicleListener());
         view.addListVehicleSelectionListener(new ListVehicleSelectionListener());
         view.addSortByBienSoListener(new SortVehicleBienSoListener());
-        view.addSearchListener(new SearchVehicleListener());
-        view.addSearchDialogListener(new SearchVehicleListener());
+        
+        // Gán chung 1 listener cho cả nút Tìm kiếm và Lọc Ngày
+        SearchVehicleListener searchListener = new SearchVehicleListener();
+        view.addSearchListener(searchListener);
+        view.addFilterDateListener(searchListener);
+
         view.addSortByNgayVaoBaiListener(new SortVehicleNgayVaoBaiListener());
         view.addSortByIDListener(new SortVehicleIDListener());
         view.addCancelSearchVehicleListener(new CancelSearchVehicleListener());
         view.addImageVehicleListener(new ImageVehicleListener());
-        view.addCancelDialogListener(new CancelDialogSearchVehicleListener());
         view.addUndoListener(new UndoListener());
         view.addStatisticListener(new StatisticViewListener());
         view.addStatisticTypeListener(new StatisticVehicleTypeListener());
         view.addStatisticClearListener(new StatisticClearListener());
-
-        view.addParkingSlotChangeListener(new ParkingSlotChangeListener());
     }
 
     public void showManagerView() {
@@ -110,7 +112,7 @@ public class VehicleDetailController {
                 managerVehicleDetail.saveToHistory(vehicle);
                 managerVehicleDetail.delete(vehicle);
 
-                managerView.clearVehicleInfo();
+                managerView.clearVehicleInfo(); // Hàm này đã bao gồm bật lại nút Thêm
                 managerView.showListVehicles(managerVehicleDetail.getListVehicleDetails());
                 managerView.showCountListVehicles(managerVehicleDetail.getListVehicleDetails());
                 
@@ -186,22 +188,6 @@ public class VehicleDetailController {
         }
     }
 
-    class ParkingSlotChangeListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            String selectedSlotName = managerView.getSelectedParkingSlot();
-            if (selectedSlotName != null) {
-                List<ParkingSlot> slots = managerParkingSlot.getListParkingSlots();
-                for (ParkingSlot slot : slots) {
-                    if (selectedSlotName.equalsIgnoreCase(slot.getTenViTri())) {
-                        managerView.setGiaTienText(String.valueOf(slot.getGiaTien()));
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
     class AddVehicleListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             VehicleDetail vehicle = managerView.getVehicleInfo();
@@ -215,7 +201,7 @@ public class VehicleDetailController {
                 managerView.showListVehicles(managerVehicleDetail.getListVehicleDetails());
                 managerView.showCountListVehicles(managerVehicleDetail.getListVehicleDetails());
                 managerView.setParkingSlotList(managerParkingSlot.getListParkingSlots());
-                managerView.clearVehicleInfo();
+                managerView.clearVehicleInfo(); // Reset lại form & tự bật lại nút Thêm
                 
                 managerView.showMessage("Thêm thông tin xe thành công!");
             }
@@ -251,7 +237,7 @@ public class VehicleDetailController {
                 managerView.showListVehicles(managerVehicleDetail.getListVehicleDetails());
                 managerView.showCountListVehicles(managerVehicleDetail.getListVehicleDetails());
                 managerView.setParkingSlotList(managerParkingSlot.getListParkingSlots());
-                managerView.clearVehicleInfo();
+                managerView.clearVehicleInfo(); // Reset form & tự bật lại nút Thêm
                 
                 managerView.showMessage("Cập nhật thông tin xe thành công!");
             }
@@ -268,7 +254,7 @@ public class VehicleDetailController {
                     managerParkingSlot.updateSlotStatus(vehicle.getViTriDo(), false);
                 }
 
-                managerView.clearVehicleInfo();
+                managerView.clearVehicleInfo(); // Reset form & tự bật lại nút Thêm
                 managerView.showListVehicles(managerVehicleDetail.getListVehicleDetails());
                 managerView.showCountListVehicles(managerVehicleDetail.getListVehicleDetails());
                 managerView.setParkingSlotList(managerParkingSlot.getListParkingSlots());
@@ -285,7 +271,7 @@ public class VehicleDetailController {
 
     class ClearVehicleListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            managerView.clearVehicleInfo();
+            managerView.clearVehicleInfo(); // Hàm này đã bao gồm setAddButtonEnabled(true)
         }
     }
 
@@ -310,80 +296,89 @@ public class VehicleDetailController {
         }
     }
     
-    class SearchVehicleViewListener implements ActionListener {
-        public void actionPerformed(ActionEvent e) {
-            managerView.searchVehicleInfo();
-        }
-    }
-    
     class StatisticViewListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             managerView.displayStatisticView();
         }
     }
-    
-    // Đã cập nhật xử lý logic Tìm kiếm chuẩn theo lựa chọn ComboBox
+
+    // --- XỬ LÝ TÌM KIẾM + LỌC NGÀY KẾT HỢP ---
     class SearchVehicleListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            List<VehicleDetail> temp = new ArrayList<>();
-            int check = managerView.getChooseSelectSearch();
-            String search = managerView.validateSearch();
+            String keyword = managerView.validateSearch().toLowerCase().trim();
+            boolean isFilterDate = managerView.isDateFilterEnabled();
+            Date selectedDate = managerView.getSelectedFilterDate();
 
-            if (search.isEmpty()) {
-                managerView.showMessage("Vui lòng nhập từ khóa tìm kiếm!");
-                return;
-            }
+            SimpleDateFormat sdfCompare = new SimpleDateFormat("dd/MM/yyyy");
+            String selectedDateStr = (selectedDate != null) ? sdfCompare.format(selectedDate) : "";
 
-            switch (check) {
-                case 1: // Biển số (Chữ)
-                    temp = managerVehicleDetail.searchByBienSo(search);
-                    break;
+            List<VehicleDetail> allVehicles = managerVehicleDetail.getListVehicleDetails();
 
-                case 2: // ID (Số)
-                    try {
-                        int searchId = Integer.parseInt(search);
-                        for (VehicleDetail v : managerVehicleDetail.getListVehicleDetails()) {
-                            if (v.getId() == searchId) {
-                                temp.add(v);
-                            }
-                        }
-                    } catch (NumberFormatException ex) {
-                        managerView.showMessage("ID phải là số nguyên hợp lệ!");
-                        return;
+            SimpleDateFormat sdfStandard = new SimpleDateFormat("HH:mm dd/MM/yyyy");
+            DecimalFormat dfFormated = new DecimalFormat("#,###");
+
+            List<VehicleDetail> filteredList = allVehicles.stream().filter(v -> {
+                // 1. Nếu checkbox "Lọc Ngày" được bật -> Bắt buộc xe phải thuộc ngày đã chọn
+                if (isFilterDate) {
+                    if (v.getNgayVaoBai() == null) return false;
+                    String vehicleDateStr = sdfCompare.format(v.getNgayVaoBai());
+                    if (!vehicleDateStr.equals(selectedDateStr)) {
+                        return false;
                     }
-                    break;
+                }
 
-                case 3: // Loại xe
-                    temp = managerVehicleDetail.searchByLoaiXe(search);
-                    break;
+                // 2. Nếu không có từ khóa tìm kiếm -> Lấy tất cả xe thỏa mãn điều kiện ngày
+                if (keyword.isEmpty()) {
+                    return true;
+                }
 
-                case 4: // Màu xe
-                    temp = managerVehicleDetail.searchByMauXe(search);
-                    break;
-            }
+                // 3. Nếu có từ khóa -> Lọc tiếp từ khóa khớp các trường dữ liệu
+                String idStr = String.valueOf(v.getId());
+                String bienSo = v.getBienSo() != null ? v.getBienSo().toLowerCase() : "";
+                String loaiXe = v.getLoaiXe() != null ? v.getLoaiXe().toLowerCase() : "";
+                String mauXe = v.getMauXe() != null ? v.getMauXe().toLowerCase() : "";
+                String viTri = v.getViTriDo() != null ? v.getViTriDo().toLowerCase() : "";
 
-            if (!temp.isEmpty()) {
-                managerView.showListVehicles(temp);
-                managerView.showCountListVehicles(temp);
-            } else {
-                managerView.showMessage("Không tìm thấy kết quả phù hợp!");
+                String ngayVaoStr = v.getNgayVaoBai() != null ? sdfStandard.format(v.getNgayVaoBai()).toLowerCase() : "";
+                String giaTienTho = String.valueOf((long) v.getGiaTien());
+                String giaTienFormatted = dfFormated.format(v.getGiaTien()).toLowerCase();
+
+                return idStr.contains(keyword)
+                        || bienSo.contains(keyword)
+                        || loaiXe.contains(keyword)
+                        || mauXe.contains(keyword)
+                        || viTri.contains(keyword)
+                        || ngayVaoStr.contains(keyword)
+                        || giaTienTho.contains(keyword)
+                        || giaTienFormatted.contains(keyword);
+            }).collect(Collectors.toList());
+
+            // Hiển thị kết quả lên giao diện
+            managerView.showListVehicles(filteredList);
+            managerView.showCountListVehicles(filteredList);
+
+            if (filteredList.isEmpty()) {
+                String msg = "Không tìm thấy kết quả!";
+                if (isFilterDate && !keyword.isEmpty()) {
+                    msg = String.format("Không tìm thấy xe khớp từ khóa '%s' trong ngày %s!", keyword, selectedDateStr);
+                } else if (isFilterDate) {
+                    msg = "Không có xe nào vào bãi trong ngày: " + selectedDateStr;
+                } else if (!keyword.isEmpty()) {
+                    msg = "Không tìm thấy xe phù hợp từ khóa: " + keyword;
+                }
+                managerView.showMessage(msg);
             }
         }
     }
-    
-    class CancelDialogSearchVehicleListener implements ActionListener {
-        public void actionPerformed(ActionEvent e) {
-            managerView.cancelDialogSearchVehicleInfo();
-        }
-    }
-    
+
+    // --- HỦY LỌC TÌM KIẾM ---
     class CancelSearchVehicleListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
+            managerView.cancelSearchVehicle(); // Reset ô chữ + Bỏ tích lọc ngày từ View
             List<VehicleDetail> fullList = managerVehicleDetail.getListVehicleDetails();
             managerView.showListVehicles(fullList);
             managerView.showCountListVehicles(fullList);
-            managerView.cancelSearchVehicle();
         }
     }
     
@@ -396,11 +391,14 @@ public class VehicleDetailController {
         }
     }
 
+    // --- XỬ LÝ SỰ KIỆN CLICK CHỌN XE TỪ BẢNG ---
     class ListVehicleSelectionListener implements ListSelectionListener {
         public void valueChanged(ListSelectionEvent e) {
             if (!e.getValueIsAdjusting()) {
                 try {
                     managerView.fillVehicleFromSelectedRow();
+                    // VÔ HIỆU HÓA NÚT THÊM KHI ĐÃ CHỌN XE TỪ BẢNG
+                    managerView.setAddButtonEnabled(false);
                 } catch (ParseException ex) {
                     Logger.getLogger(VehicleDetailController.class.getName()).log(Level.SEVERE, null, ex);
                 }

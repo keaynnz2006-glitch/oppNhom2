@@ -1,4 +1,3 @@
-quanlybaixe\controller\VehicleDetailController$CancelDialogSearchVehicleListener.class
 quanlybaixe\controller\VehicleDetailController$SortVehicleIDListener.class
 quanlybaixe\controller\VehicleDetailController$CheckoutVehicleListener.class
 quanlybaixe\entity\ParkingSlotXML.class
@@ -32,12 +31,10 @@ quanlybaixe\controller\LoginController.class
 quanlybaixe\controller\VehicleDetailController$SortVehicleBienSoListener.class
 quanlybaixe\action\ManagerVehicleDetail.class
 quanlybaixe\controller\VehicleDetailController$UndoListener.class
-quanlybaixe\controller\VehicleDetailController$SearchVehicleViewListener.class
 quanlybaixe\view\ParkingSlotView$2.class
 quanlybaixe\controller\VehicleDetailController$HistoryVehicleListener.class
 quanlybaixe\controller\MainController$ChooseVehicleDetailListener.class
 quanlybaixe\controller\VehicleDetailController$ClearVehicleListener.class
-quanlybaixe\controller\VehicleDetailController$ParkingSlotChangeListener.class
 quanlybaixe\controller\ParkingSlotController.class
 quanlybaixe\view\DashboardView.class
 quanlybaixe\controller\ParkingSlotController$SearchParkingSlotListener.class
