@@ -109,8 +109,8 @@ public class DashboardView extends JFrame {
             }
         }
 
-        // KỸ THUẬT XỬ LÝ: Nếu ít hơn 2 ngày dữ liệu -> Tự động chèn mốc ngày trước/sau với = 0 VNĐ
-        // Giúp biểu đồ LUÔN VẼ ĐƯỢC NỐI LÊN XUỐNG chứ không bị trôi 1 chấm đơn độc
+      
+       
         if (dailyRevenue.isEmpty()) {
             dailyRevenue.put(dateFormat.format(new Date()), 0.0);
         } else if (dailyRevenue.size() == 1) {
