@@ -25,9 +25,8 @@ public class ParkingSlotView extends JFrame {
     private JRadioButton rdoSortId, rdoSortViTri, rdoSortGiaTien;
     private ButtonGroup bgSort;
 
-    private JRadioButton rdoSearchViTri, rdoSearchLoaiSlot;
-    private ButtonGroup bgSearch;
-    private JTextField txtSearchInput;
+    private JTextField txtSearchGeneral;
+    private JComboBox<String> cbFilterTrangThai;
 
     private JButton btnAdd, btnEdit, btnDelete, btnClear, btnSort, btnSearch, btnCancelSearch, btnUndo;
 
@@ -36,15 +35,14 @@ public class ParkingSlotView extends JFrame {
 
     public ParkingSlotView() {
         setTitle("Quản Lý Sơ Đồ / Vị Trí Đỗ Xe");
-        setSize(980, 620);
+        setSize(1050, 650);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout(10, 10));
 
-        // --- 1. TIÊU ĐỀ ---
         JPanel panelTitle = new JPanel();
         panelTitle.setBackground(new Color(33, 150, 243));
-        panelTitle.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+        panelTitle.setBorder(BorderFactory.createEmptyBorder(12, 0, 12, 0));
         
         JLabel lblTitle = new JLabel("QUẢN LÝ VỊ TRÍ ĐỖ XE");
         lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 22));
@@ -52,7 +50,6 @@ public class ParkingSlotView extends JFrame {
         panelTitle.add(lblTitle);
         add(panelTitle, BorderLayout.NORTH);
 
-        // --- 2. FORM NHẬP THÔNG TIN (BÊN TRÁI) ---
         JPanel panelForm = new JPanel(new GridBagLayout());
         panelForm.setBorder(BorderFactory.createTitledBorder("Thông tin vị trí đỗ"));
         GridBagConstraints gbc = new GridBagConstraints();
@@ -60,11 +57,12 @@ public class ParkingSlotView extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         txtId = new JTextField(15);
-        txtId.setEditable(false); // ID tự động sinh
+        txtId.setEditable(false);
         txtTenViTri = new JTextField(15);
 
         String[] loaiSlotOptions = {"Xe máy", "Ô tô"};
         cbLoaiSlot = new JComboBox<>(loaiSlotOptions);
+        cbLoaiSlot.addActionListener(e -> autoFillPrice());
 
         txtGiaTien = new JTextField(15);
         chkTrangThai = new JCheckBox("Đã có xe đỗ");
@@ -77,7 +75,8 @@ public class ParkingSlotView extends JFrame {
         addFormField(panelForm, gbc, 4, "Trạng thái:", chkTrangThai);
         addFormField(panelForm, gbc, 5, "Ghi chú:", txtGhiChu);
 
-        // Nút chức năng Form
+        autoFillPrice();
+
         JPanel panelButtons = new JPanel(new GridLayout(2, 3, 5, 5));
         btnAdd = new JButton("Thêm");
         btnEdit = new JButton("Sửa");
@@ -96,54 +95,48 @@ public class ParkingSlotView extends JFrame {
 
         add(panelForm, BorderLayout.WEST);
 
-        // --- 3. BẢNG DANH SÁCH & CÔNG CỤ (BÊN PHẢI) ---
         JPanel panelRight = new JPanel(new BorderLayout(5, 5));
         panelRight.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 10));
 
-        // Panel Tìm kiếm & Sắp xếp
         JPanel panelTools = new JPanel(new GridLayout(2, 1, 5, 5));
-        panelTools.setBorder(BorderFactory.createTitledBorder("Công cụ Tìm kiếm & Sắp xếp"));
+        panelTools.setBorder(BorderFactory.createTitledBorder("Công cụ Tìm kiếm, Lọc & Sắp xếp"));
 
-        // Khu vực Sắp xếp
-        JPanel panelSort = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
+        JPanel panelSortFilter = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
+        
         rdoSortId = new JRadioButton("ID");
         rdoSortViTri = new JRadioButton("Tên vị trí");
         rdoSortGiaTien = new JRadioButton("Giá tiền");
         bgSort = new ButtonGroup();
         bgSort.add(rdoSortId); bgSort.add(rdoSortViTri); bgSort.add(rdoSortGiaTien);
         rdoSortId.setSelected(true);
-
         btnSort = new JButton("Sắp xếp");
-        panelSort.add(new JLabel("Sắp xếp theo:"));
-        panelSort.add(rdoSortId); 
-        panelSort.add(rdoSortViTri); 
-        panelSort.add(rdoSortGiaTien);
-        panelSort.add(btnSort);
 
-        // Khu vực Tìm kiếm
+        panelSortFilter.add(new JLabel("Sắp xếp:"));
+        panelSortFilter.add(rdoSortId); 
+        panelSortFilter.add(rdoSortViTri); 
+        panelSortFilter.add(rdoSortGiaTien);
+        panelSortFilter.add(btnSort);
+
+        panelSortFilter.add(new JSeparator(JSeparator.VERTICAL));
+        panelSortFilter.add(new JLabel("Lọc trạng thái:"));
+        cbFilterTrangThai = new JComboBox<>(new String[]{"Tất cả", " Còn trống", " Đã đỗ"});
+        panelSortFilter.add(cbFilterTrangThai);
+
         JPanel panelSearch = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
-        rdoSearchViTri = new JRadioButton("Vị trí");
-        rdoSearchLoaiSlot = new JRadioButton("Loại Slot");
-        bgSearch = new ButtonGroup();
-        bgSearch.add(rdoSearchViTri); bgSearch.add(rdoSearchLoaiSlot);
-        rdoSearchViTri.setSelected(true);
+        txtSearchGeneral = new JTextField(20);
 
-        txtSearchInput = new JTextField(12);
         btnSearch = new JButton("Tìm kiếm");
         btnCancelSearch = new JButton("Hủy tìm");
 
-        panelSearch.add(new JLabel("Tìm theo:"));
-        panelSearch.add(rdoSearchViTri); 
-        panelSearch.add(rdoSearchLoaiSlot);
-        panelSearch.add(txtSearchInput);
+        panelSearch.add(new JLabel("Từ khóa tìm kiếm:"));
+        panelSearch.add(txtSearchGeneral);
         panelSearch.add(btnSearch);
         panelSearch.add(btnCancelSearch);
 
-        panelTools.add(panelSort);
+        panelTools.add(panelSortFilter);
         panelTools.add(panelSearch);
         panelRight.add(panelTools, BorderLayout.NORTH);
 
-        // Bảng dữ liệu
         String[] columnNames = {"ID", "Tên Vị Trí", "Loại Slot", "Giá Tiền (VNĐ)", "Trạng Thái", "Ghi Chú"};
         tableModel = new DefaultTableModel(columnNames, 0) {
             @Override
@@ -152,21 +145,45 @@ public class ParkingSlotView extends JFrame {
             }
         };
         tableSlot = new JTable(tableModel);
-        tableSlot.setRowHeight(25);
+        tableSlot.setRowHeight(28);
         tableSlot.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
 
-        // Căn giữa dữ liệu các cột ID, Loại Slot, Trạng thái
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(JLabel.CENTER);
         tableSlot.getColumnModel().getColumn(0).setCellRenderer(centerRenderer); 
         tableSlot.getColumnModel().getColumn(2).setCellRenderer(centerRenderer); 
-        tableSlot.getColumnModel().getColumn(4).setCellRenderer(centerRenderer); 
+
+        tableSlot.getColumnModel().getColumn(4).setCellRenderer(new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                setHorizontalAlignment(JLabel.CENTER);
+                setFont(new Font("Segoe UI", Font.BOLD, 12));
+                
+                if (value != null) {
+                    String status = value.toString();
+                    if ("Đã đỗ".equals(status)) {
+                        setForeground(new Color(211, 47, 47));
+                    } else if ("Còn trống".equals(status)) {
+                        setForeground(new Color(46, 125, 50));
+                    } else {
+                        setForeground(Color.BLACK);
+                    }
+                }
+                
+                if (isSelected) {
+                    setBackground(table.getSelectionBackground());
+                } else {
+                    setBackground(table.getBackground());
+                }
+                return c;
+            }
+        });
 
         JScrollPane scrollPane = new JScrollPane(tableSlot);
         panelRight.add(scrollPane, BorderLayout.CENTER);
 
-        // Thanh trạng thái đếm số lượng
-        lblTotalCount = new JLabel("Tổng số vị trí đỗ: 0");
+        lblTotalCount = new JLabel("Tổng số vị trí: 0 | Đã đỗ: 0 |  Còn trống: 0");
         lblTotalCount.setFont(new Font("Segoe UI", Font.BOLD, 13));
         JPanel panelFooter = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panelFooter.add(lblTotalCount);
@@ -182,7 +199,16 @@ public class ParkingSlotView extends JFrame {
         panel.add(comp, gbc);
     }
 
-    // --- CÁC HÀM XỬ LÝ DỮ LIỆU ---
+    private void autoFillPrice() {
+        if (txtGiaTien.getText().trim().isEmpty() || txtGiaTien.getText().equals("5000") || txtGiaTien.getText().equals("10000")) {
+            String selectedType = (String) cbLoaiSlot.getSelectedItem();
+            if ("Xe máy".equalsIgnoreCase(selectedType)) {
+                txtGiaTien.setText("5000");
+            } else if ("Ô tô".equalsIgnoreCase(selectedType)) {
+                txtGiaTien.setText("10000");
+            }
+        }
+    }
 
     public ParkingSlot getParkingSlotInfo() {
         try {
@@ -251,14 +277,18 @@ public class ParkingSlotView extends JFrame {
     }
 
     public void showCountListParkingSlots(List<ParkingSlot> list) {
-        lblTotalCount.setText("Tổng số vị trí đỗ: " + (list != null ? list.size() : 0));
+        int total = list != null ? list.size() : 0;
+        long occupied = list != null ? list.stream().filter(ParkingSlot::isTrangThai).count() : 0;
+        long available = total - occupied;
+
+        lblTotalCount.setText(String.format("Tổng số vị trí: %d  |   Đã đỗ: %d  |  Còn trống: %d", total, occupied, available));
     }
 
     public void clearParkingSlotInfo() {
         txtId.setText("");
         txtTenViTri.setText("");
         cbLoaiSlot.setSelectedIndex(0);
-        txtGiaTien.setText("");
+        autoFillPrice();
         chkTrangThai.setSelected(false);
         txtGhiChu.setText("");
         tableSlot.clearSelection();
@@ -271,25 +301,19 @@ public class ParkingSlotView extends JFrame {
         return 0;
     }
 
-    public int getChooseSelectSearch() {
-        if (rdoSearchViTri.isSelected()) return 1;
-        if (rdoSearchLoaiSlot.isSelected()) return 2;
-        return 0;
-    }
-
     public String validateSearch() {
-        return txtSearchInput.getText().trim();
+        return txtSearchGeneral.getText().trim();
     }
 
     public void cancelSearchParkingSlot() {
-        txtSearchInput.setText("");
+        txtSearchGeneral.setText("");
+        cbFilterTrangThai.setSelectedIndex(0);
     }
 
     public void showMessage(String message) {
         JOptionPane.showMessageDialog(this, message);
     }
 
-    // --- BỘ LẮNG NGHE CHO CONTROLLER ---
     public void addUndoListener(ActionListener l) { btnUndo.addActionListener(l); }
     public void addAddParkingSlotListener(ActionListener l) { btnAdd.addActionListener(l); }
     public void addEditParkingSlotListener(ActionListener l) { btnEdit.addActionListener(l); }
@@ -298,6 +322,8 @@ public class ParkingSlotView extends JFrame {
     public void addSortParkingSlotListener(ActionListener l) { btnSort.addActionListener(l); }
     public void addSearchDialogListener(ActionListener l) { btnSearch.addActionListener(l); }
     public void addCancelSearchParkingSlotListener(ActionListener l) { btnCancelSearch.addActionListener(l); }
+
+    public void addFilterTrangThaiListener(ActionListener l) { cbFilterTrangThai.addActionListener(l); }
 
     public void addListParkingSlotSelectionListener(ListSelectionListener l) {
         tableSlot.getSelectionModel().addListSelectionListener(l);

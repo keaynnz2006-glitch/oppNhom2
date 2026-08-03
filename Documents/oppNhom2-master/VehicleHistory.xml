@@ -32,4 +32,15 @@
         <viTriDo>B03</viTriDo>
         <giaTien>10000.0</giaTien>
     </VehicleDetail>
+    <VehicleDetail>
+        <id>2</id>
+        <bienSo>98FA</bienSo>
+        <loaiXe>Ô tô</loaiXe>
+        <mauXe>ĐEN</mauXe>
+        <ngayVaoBai>13:59 03/08/2026</ngayVaoBai>
+        <ngayXuatBai>05:36 04/08/2026</ngayXuatBai>
+        <hinhAnh></hinhAnh>
+        <viTriDo>B01</viTriDo>
+        <giaTien>10000.0</giaTien>
+    </VehicleDetail>
 </VehicleDetails>

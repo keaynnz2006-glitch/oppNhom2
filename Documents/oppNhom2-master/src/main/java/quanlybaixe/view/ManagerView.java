@@ -27,7 +27,7 @@ public class ManagerView extends JFrame {
     private JButton btnSelectSlot;
     private JLabel lblTotalCount, lblStatistic;
     
-    // ĐƯA TÌM KIẾM RA GIAO DIỆN CHÍNH
+    
     private JComboBox<String> cbSearchCriteria; // Chọn tiêu chí: ID (Số), Biển số (Chữ), ...
     private JTextField txtSearchInput;
 

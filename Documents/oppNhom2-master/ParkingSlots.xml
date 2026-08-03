@@ -37,7 +37,7 @@
         <tenViTri>B01</tenViTri>
         <loaiSlot>Ô tô</loaiSlot>
         <giaTien>10000.0</giaTien>
-        <trangThai>true</trangThai>
+        <trangThai>false</trangThai>
         <ghiChu></ghiChu>
     </ParkingSlot>
     <ParkingSlot>

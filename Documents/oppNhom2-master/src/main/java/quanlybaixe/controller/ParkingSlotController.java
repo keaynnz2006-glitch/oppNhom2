@@ -7,8 +7,9 @@ import quanlybaixe.view.ParkingSlotView;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import javax.swing.JComboBox;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -21,7 +22,6 @@ public class ParkingSlotController {
         this.parkingSlotView = view;
         this.managerParkingSlot = new ManagerParkingSlot();
         
-        // Đăng ký các sự kiện tương thích với ParkingSlotView
         view.addUndoListener(new UndoListener());
         view.addAddParkingSlotListener(new AddParkingSlotListener());
         view.addListParkingSlotSelectionListener(new ListParkingSlotsSelectionListener());
@@ -31,6 +31,7 @@ public class ParkingSlotController {
         view.addSortParkingSlotListener(new SortParkingSlotsListener());
         view.addSearchDialogListener(new SearchParkingSlotListener());
         view.addCancelSearchParkingSlotListener(new CancelSearchParkingSlotListener());
+        view.addFilterTrangThaiListener(new FilterTrangThaiListener());
     }
     
     public void showManagerView() {
@@ -40,17 +41,15 @@ public class ParkingSlotController {
         parkingSlotView.showCountListParkingSlots(slotsList);
     }
     
-    // Nút "Quay lại"
     class UndoListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             mainView = new MainView();
             MainController mainController = new MainController(mainView);
             mainController.showMainView();
-            parkingSlotView.dispose(); // Đóng cửa sổ hiện tại để tránh rác bộ nhớ
+            parkingSlotView.dispose();
         }
     }
     
-    // Nút "Thêm"
     class AddParkingSlotListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             ParkingSlot slot = parkingSlotView.getParkingSlotInfo();
@@ -74,7 +73,6 @@ public class ParkingSlotController {
         }
     }
     
-    // Nút "Sửa"
     class EditParkingSlotListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             ParkingSlot slot = parkingSlotView.getParkingSlotInfo();
@@ -95,7 +93,6 @@ public class ParkingSlotController {
         }
     }
     
-    // Nút "Xóa"
     class DeleteParkingSlotListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             ParkingSlot slot = parkingSlotView.getParkingSlotInfo();
@@ -111,7 +108,6 @@ public class ParkingSlotController {
         }
     }
     
-    // Sự kiện Chọn dòng trên Bảng
     class ListParkingSlotsSelectionListener implements ListSelectionListener {
         public void valueChanged(ListSelectionEvent e) {
             if (!e.getValueIsAdjusting()) {
@@ -121,14 +117,12 @@ public class ParkingSlotController {
         }
     }
     
-    // Nút "Làm mới / Nhập lại"
     class ClearParkingSlotListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             parkingSlotView.clearParkingSlotInfo();
         }
     }
     
-    // Nút "Sắp xếp"
     class SortParkingSlotsListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             int check = parkingSlotView.getChooseSelectSort();
@@ -146,8 +140,32 @@ public class ParkingSlotController {
             parkingSlotView.showListParkingSlots(sortedList);
         }
     }
+
+    class FilterTrangThaiListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            JComboBox<?> cb = (JComboBox<?>) e.getSource();
+            int selectedIndex = cb.getSelectedIndex();
+            List<ParkingSlot> allSlots = managerParkingSlot.getListParkingSlots();
+            
+            if (selectedIndex == 1) {
+                List<ParkingSlot> availableList = allSlots.stream()
+                        .filter(slot -> !slot.isTrangThai())
+                        .collect(Collectors.toList());
+                parkingSlotView.showListParkingSlots(availableList);
+                parkingSlotView.showCountListParkingSlots(availableList);
+            } else if (selectedIndex == 2) {
+                List<ParkingSlot> occupiedList = allSlots.stream()
+                        .filter(ParkingSlot::isTrangThai)
+                        .collect(Collectors.toList());
+                parkingSlotView.showListParkingSlots(occupiedList);
+                parkingSlotView.showCountListParkingSlots(occupiedList);
+            } else {
+                parkingSlotView.showListParkingSlots(allSlots);
+                parkingSlotView.showCountListParkingSlots(allSlots);
+            }
+        }
+    }
     
-    // Nút "Hủy tìm"
     class CancelSearchParkingSlotListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             List<ParkingSlot> allSlots = managerParkingSlot.getListParkingSlots();
@@ -157,32 +175,30 @@ public class ParkingSlotController {
         }
     }
     
-    // Nút "Tìm kiếm"
     class SearchParkingSlotListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            List<ParkingSlot> temp = new ArrayList<>();
-            int check = parkingSlotView.getChooseSelectSearch();
-            String search = parkingSlotView.validateSearch();
+            String keyword = parkingSlotView.validateSearch().toLowerCase();
             
-            if (search == null || search.trim().isEmpty()) {
+            if (keyword.isEmpty()) {
                 parkingSlotView.showMessage("Vui lòng nhập từ khóa tìm kiếm!");
                 return;
             }
             
-            if (check == 1) {
-                temp = managerParkingSlot.searchByTenViTri(search);
-            } else if (check == 2) {
-                temp = managerParkingSlot.searchByLoaiSlot(search);
-            } else {
-                parkingSlotView.showMessage("Vui lòng chọn tiêu chí tìm kiếm!");
-                return;
-            }
+            List<ParkingSlot> allSlots = managerParkingSlot.getListParkingSlots();
             
-            parkingSlotView.showListParkingSlots(temp);
-            parkingSlotView.showCountListParkingSlots(temp);
+            List<ParkingSlot> filteredList = allSlots.stream().filter(slot -> 
+                String.valueOf(slot.getId()).contains(keyword) ||
+                (slot.getTenViTri() != null && slot.getTenViTri().toLowerCase().contains(keyword)) ||
+                (slot.getLoaiSlot() != null && slot.getLoaiSlot().toLowerCase().contains(keyword)) ||
+                String.valueOf(slot.getGiaTien()).contains(keyword) ||
+                (slot.getGhiChu() != null && slot.getGhiChu().toLowerCase().contains(keyword))
+            ).collect(Collectors.toList());
             
-            if (temp.isEmpty()) {
-                parkingSlotView.showMessage("Không tìm thấy vị trí đỗ phù hợp!");
+            parkingSlotView.showListParkingSlots(filteredList);
+            parkingSlotView.showCountListParkingSlots(filteredList);
+            
+            if (filteredList.isEmpty()) {
+                parkingSlotView.showMessage("Không tìm thấy kết quả phù hợp với từ khóa: " + keyword);
             }
         }
     }

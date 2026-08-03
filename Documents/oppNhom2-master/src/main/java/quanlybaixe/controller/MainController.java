@@ -54,9 +54,10 @@ public class MainController {
     class ChooseDashboardListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            // Truyền trực tiếp managerVehicleDetail để Dashboard lấy đủ cả xe trong bãi lẫn lịch sử
-            DashboardView dashboard = new DashboardView(managerVehicleDetail);
+            // Truyền cả managerVehicleDetail và mainView vào DashboardView
+            DashboardView dashboard = new DashboardView(managerVehicleDetail, mainView);
             dashboard.setVisible(true);
+            mainView.setVisible(false); // Ẩn MainView đi
         }
     }
 }

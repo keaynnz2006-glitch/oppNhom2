@@ -11,7 +11,6 @@ import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PiePlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.category.BarRenderer;
-import org.jfree.chart.renderer.category.LineAndShapeRenderer;
 import org.jfree.chart.renderer.category.StandardBarPainter;
 import org.jfree.chart.title.TextTitle;
 import org.jfree.data.category.DefaultCategoryDataset;
@@ -21,6 +20,8 @@ import quanlybaixe.entity.VehicleDetail;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -32,7 +33,7 @@ public class DashboardView extends JFrame {
     private final DecimalFormat priceFormat = new DecimalFormat("#,###");
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
-    public DashboardView(ManagerVehicleDetail manager) {
+    public DashboardView(ManagerVehicleDetail manager, MainView mainView) {
         List<VehicleDetail> activeList = manager.getListVehicleDetails();    // Xe đang gửi trong bãi
         List<VehicleDetail> historyList = manager.getHistoryVehicleDetails(); // Xe đã thanh toán xuất bãi
 
@@ -47,6 +48,16 @@ public class DashboardView extends JFrame {
         setLayout(new BorderLayout(15, 15));
         getContentPane().setBackground(new Color(245, 247, 250));
 
+        // Bắt sự kiện tắt cửa sổ X -> Tự động hiện lại MainView
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                if (mainView != null) {
+                    mainView.setVisible(true);
+                }
+            }
+        });
+
         // 1. Thẻ Thống Kê
         add(createHeaderPanel(activeList, historyList, allList), BorderLayout.NORTH);
 
@@ -54,9 +65,9 @@ public class DashboardView extends JFrame {
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setFont(new Font("Segoe UI", Font.BOLD, 13));
 
-        tabbedPane.addTab("📈 Biến Động Doanh Thu (Line Chart)", createRevenueLineChartPanel(historyList));
+        tabbedPane.addTab("📊 Doanh Thu 30 Ngày Gần Nhất", createRevenueBarChartPanel(historyList));
         tabbedPane.addTab("🥧 Cơ Cấu Doanh Thu", createRevenueByVehicleTypePanel(allList));
-        tabbedPane.addTab("📊 Xe Trong Bãi Hiện Tại", createVehicleCountPanel(activeList));
+        tabbedPane.addTab("🚗 Xe Trong Bãi Hiện Tại", createVehicleCountPanel(activeList));
 
         add(tabbedPane, BorderLayout.CENTER);
     }
@@ -95,88 +106,71 @@ public class DashboardView extends JFrame {
         return card;
     }
 
-    // --- TAB 1: BIỂU ĐỒ ĐƯỜNG LÊN XUỐNG (ĐÃ FIX TỰ ĐỘNG NỐI ĐƯỜNG) ---
-    private JPanel createRevenueLineChartPanel(List<VehicleDetail> historyList) {
+    // --- TAB 1: DOANH THU THEO NGÀY XUẤT BÃI (GIỚI HẠN 30 NGÀY GẦN NHẤT) ---
+    private JPanel createRevenueBarChartPanel(List<VehicleDetail> historyList) {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
         Map<String, Double> dailyRevenue = new TreeMap<>();
 
         if (historyList != null) {
             for (VehicleDetail v : historyList) {
-                if (v.getNgayVaoBai() != null) {
-                    String dateStr = dateFormat.format(v.getNgayVaoBai());
+                // Ưu tiên lấy ngayXuatBai, nếu null mới lấy ngayVaoBai
+                Date ngayGhiNhan = v.getNgayXuatBai() != null ? v.getNgayXuatBai() : v.getNgayVaoBai();
+
+                if (ngayGhiNhan != null) {
+                    String dateStr = dateFormat.format(ngayGhiNhan);
                     dailyRevenue.put(dateStr, dailyRevenue.getOrDefault(dateStr, 0.0) + v.getGiaTien());
                 }
             }
         }
 
-      
-       
         if (dailyRevenue.isEmpty()) {
             dailyRevenue.put(dateFormat.format(new Date()), 0.0);
-        } else if (dailyRevenue.size() == 1) {
-            try {
-                String singleDateStr = dailyRevenue.keySet().iterator().next();
-                Date singleDate = dateFormat.parse(singleDateStr);
-                
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(singleDate);
-                
-                // Thêm ngày hôm trước (0 VNĐ)
-                cal.add(Calendar.DAY_OF_MONTH, -1);
-                String prevDate = dateFormat.format(cal.getTime());
-                
-                // Thêm ngày hôm sau (0 VNĐ)
-                cal.add(Calendar.DAY_OF_MONTH, 2);
-                String nextDate = dateFormat.format(cal.getTime());
+        }
 
-                Map<String, Double> fixedMap = new TreeMap<>();
-                fixedMap.put(prevDate, 0.0);
-                fixedMap.put(singleDateStr, dailyRevenue.get(singleDateStr));
-                fixedMap.put(nextDate, 0.0);
-                
-                dailyRevenue = fixedMap;
-            } catch (Exception e) {
-                e.printStackTrace();
+        // --- CẮT DỮ LIỆU: CHỈ GIỮ LAI TỐI ĐA 30 NGÀY MỚI NHẤT ---
+        int maxDays = 30;
+        List<String> dates = new ArrayList<>(dailyRevenue.keySet());
+        
+        if (dates.size() > maxDays) {
+            // Lấy danh sách các ngày cũ hơn mốc 30 ngày để xóa
+            List<String> datesToRemove = dates.subList(0, dates.size() - maxDays);
+            for (String oldDate : datesToRemove) {
+                dailyRevenue.remove(oldDate);
             }
         }
 
+        // Đổ dữ liệu đã lọc vào Dataset
         dailyRevenue.forEach((date, amount) -> dataset.addValue(amount, "Doanh Thu", date));
 
-        JFreeChart lineChart = ChartFactory.createLineChart(
-                "BIỂU ĐỒ XU HƯỚNG DOANH THU THEO NGÀY",
-                "Ngày Vào Bãi",
+        JFreeChart barChart = ChartFactory.createBarChart(
+                "BIỂU ĐỒ DOANH THU 30 NGÀY GẦN NHẤT",
+                "Ngày Xuất Bãi",
                 "Doanh Thu (VNĐ)",
                 dataset,
                 PlotOrientation.VERTICAL,
                 false, true, false
         );
 
-        lineChart.setBackgroundPaint(Color.WHITE);
-        lineChart.setTitle(new TextTitle("BIỂU ĐỒ XU HƯỚNG DOANH THU THEO NGÀY", new Font("Segoe UI", Font.BOLD, 16)));
+        barChart.setBackgroundPaint(Color.WHITE);
+        barChart.setTitle(new TextTitle("BIỂU ĐỒ DOANH THU 30 NGÀY GẦN NHẤT", new Font("Segoe UI", Font.BOLD, 16)));
 
-        CategoryPlot plot = lineChart.getCategoryPlot();
+        CategoryPlot plot = barChart.getCategoryPlot();
         plot.setBackgroundPaint(new Color(250, 250, 250));
-        plot.setDomainGridlinePaint(new Color(220, 220, 220));
         plot.setRangeGridlinePaint(new Color(220, 220, 220));
 
-        // Tùy chỉnh renderer vẽ đường mượt + điểm tròn rõ ràng
-        LineAndShapeRenderer renderer = new LineAndShapeRenderer();
-        renderer.setSeriesPaint(0, new Color(231, 76, 60)); // Đường màu đỏ nổi bật
-        renderer.setSeriesStroke(0, new BasicStroke(3.5f)); // Nét vẽ dày mượt
+        BarRenderer renderer = (BarRenderer) plot.getRenderer();
+        renderer.setBarPainter(new StandardBarPainter());
+        renderer.setSeriesPaint(0, new Color(46, 204, 113)); // Màu xanh lá tài lộc
+        renderer.setShadowVisible(false);
 
-        // Bật vẽ điểm tròn ngay tại các mốc ngày
-        renderer.setDefaultShapesVisible(true);
-        renderer.setDefaultShapesFilled(true);
-        renderer.setSeriesShape(0, new java.awt.geom.Ellipse2D.Double(-5, -5, 10, 10)); // Nút tròn to đẹp
-
-        // Hiển thị số tiền trực tiếp trên đầu điểm
         renderer.setDefaultItemLabelGenerator(new StandardCategoryItemLabelGenerator("{2}", priceFormat));
         renderer.setDefaultItemLabelsVisible(true);
-        renderer.setDefaultItemLabelFont(new Font("Segoe UI", Font.BOLD, 12));
+        renderer.setDefaultItemLabelFont(new Font("Segoe UI", Font.BOLD, 11));
 
-        plot.setRenderer(renderer);
+        CategoryAxis domainAxis = plot.getDomainAxis();
+        domainAxis.setCategoryLabelPositions(CategoryLabelPositions.UP_45); // Xoay 45 độ cho dễ đọc
 
-        return new ChartPanel(lineChart);
+        return new ChartPanel(barChart);
     }
 
     // --- TAB 2: CƠ CẤU DOANH THU (PIE CHART) ---
