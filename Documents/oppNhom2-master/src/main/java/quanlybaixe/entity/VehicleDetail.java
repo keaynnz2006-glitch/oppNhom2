@@ -5,8 +5,8 @@ import java.util.Date;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter; // <-- THÊM DÒNG NÀY
-import quanlybaixe.utils.DateAdapter; // <-- THÊM DÒNG NÀY (Nhớ chỉnh đúng package nếu cần)
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter; 
+import quanlybaixe.utils.DateAdapter;
 
 @XmlRootElement(name = "VehicleDetail")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -18,7 +18,7 @@ public class VehicleDetail implements Serializable {
     private String loaiXe;
     private String mauXe;
 
-    @XmlJavaTypeAdapter(DateAdapter.class) // <-- THÊM DÒNG NÀY (BẮT BUỘC)
+    @XmlJavaTypeAdapter(DateAdapter.class) 
     private Date ngayVaoBai;
 
     private String hinhAnh;

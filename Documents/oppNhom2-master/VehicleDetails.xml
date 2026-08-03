@@ -3,9 +3,9 @@
     <VehicleDetail>
         <id>1</id>
         <bienSo></bienSo>
-        <loaiXe>Ô tô</loaiXe>
+        <loaiXe>Xe máy</loaiXe>
         <mauXe></mauXe>
-        <ngayVaoBai>02/08/2026</ngayVaoBai>
+        <ngayVaoBai>12:47 03/08/2026</ngayVaoBai>
         <hinhAnh></hinhAnh>
         <viTriDo>A01</viTriDo>
         <giaTien>5000.0</giaTien>

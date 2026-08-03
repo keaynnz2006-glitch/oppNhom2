@@ -1,11 +1,12 @@
-package quanlybaixe.utils; // <-- SỬA DÒNG NÀY (thay vì quanlybaixe.entity)
+package quanlybaixe.utils;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class DateAdapter extends XmlAdapter<String, Date> {
-    private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+    // Sửa định dạng thêm HH:mm để lưu cả Giờ và Phút
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm dd/MM/yyyy");
 
     @Override
     public Date unmarshal(String v) throws Exception {

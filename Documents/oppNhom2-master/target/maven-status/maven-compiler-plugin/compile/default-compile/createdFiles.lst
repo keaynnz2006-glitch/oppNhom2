@@ -17,8 +17,6 @@ quanlybaixe\view\LoginView.class
 quanlybaixe\controller\VehicleDetailController$EditVehicleListener.class
 quanlybaixe\controller\VehicleDetailController$StatisticVehicleTypeListener.class
 quanlybaixe\quanly\QuanLyBaiXe$1.class
-com\raven\main\Main.class
-com\raven\main\Main$1.class
 quanlybaixe\controller\ParkingSlotController$ClearParkingSlotListener.class
 quanlybaixe\controller\VehicleDetailController$DeleteVehicleListener.class
 com\raven\chart\blankchart\NiceScale.class
@@ -49,7 +47,6 @@ quanlybaixe\controller\ParkingSlotController.class
 com\raven\chart\LabelColor.class
 quanlybaixe\controller\ParkingSlotController$SearchParkingSlotListener.class
 quanlybaixe\utils\FileUtils.class
-com\raven\main\Main$2.class
 quanlybaixe\view\ManagerView.class
 quanlybaixe\controller\LoginController$LoginListener.class
 quanlybaixe\view\ParkingSlotView.class
@@ -67,7 +64,6 @@ quanlybaixe\controller\ParkingSlotController$AddParkingSlotListener.class
 quanlybaixe\action\CheckLogin.class
 quanlybaixe\quanly\QuanLyBaiXe.class
 quanlybaixe\controller\ParkingSlotController$DeleteParkingSlotListener.class
-com\raven\main\Main$3.class
 quanlybaixe\action\ManagerParkingSlot.class
 quanlybaixe\controller\VehicleDetailController.class
 quanlybaixe\controller\ParkingSlotController$SortParkingSlotsListener.class
