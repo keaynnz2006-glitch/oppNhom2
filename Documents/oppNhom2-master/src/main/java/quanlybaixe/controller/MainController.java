@@ -28,33 +28,29 @@ public class MainController {
         mainView.setVisible(true);
     }
 
-    // Chuyển sang màn hình Quản lý Xe vào/ra
     class ChooseVehicleDetailListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            managerView = new ManagerView();
+            managerView = new ManagerView(mainView);
             VehicleDetailController vehicleController = new VehicleDetailController(managerView);
             vehicleController.showManagerView();
             mainView.setVisible(false);
         }
     }
     
-    // Chuyển sang màn hình Quản lý Vị trí/Sơ đồ đỗ xe
     class ChooseParkingSlotListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            parkingSlotView = new ParkingSlotView();
+            parkingSlotView = new ParkingSlotView(mainView);
             ParkingSlotController slotController = new ParkingSlotController(parkingSlotView);
             slotController.showManagerView();
             mainView.setVisible(false);
         }
     }
 
-    // Mở màn hình Báo Cáo & Thống Kê
     class ChooseDashboardListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            
             DashboardView dashboard = new DashboardView(managerVehicleDetail, mainView);
             dashboard.setVisible(true);
             mainView.setVisible(false);

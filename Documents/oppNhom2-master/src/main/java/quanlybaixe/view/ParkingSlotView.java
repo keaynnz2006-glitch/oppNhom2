@@ -8,6 +8,8 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.text.DecimalFormat;
 import java.util.List;
 
@@ -33,12 +35,21 @@ public class ParkingSlotView extends JFrame {
     private JTable tableSlot;
     private DefaultTableModel tableModel;
 
-    public ParkingSlotView() {
+    public ParkingSlotView(MainView mainView) {
         setTitle("Quản Lý Sơ Đồ / Vị Trí Đỗ Xe");
         setSize(1050, 650);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout(10, 10));
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                if (mainView != null) {
+                    mainView.setVisible(true);
+                }
+            }
+        });
 
         JPanel panelTitle = new JPanel();
         panelTitle.setBackground(new Color(33, 150, 243));

@@ -9,6 +9,8 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -29,10 +31,8 @@ public class ManagerView extends JFrame {
     
     private JTextField txtSearchInput;
 
-    // Nút chức năng & Công cụ
     private JButton btnAdd, btnEdit, btnDelete, btnCheckout, btnClear, btnSortId, btnSortBienSo, btnSortNgay, btnSearch, btnCancelSearch, btnChooseImg, btnUndo, btnStatistic, btnStatisticType, btnStatisticClear, btnHistory, btnFilterDate;
 
-    // Bộ chọn ngày & Checkbox bật/tắt lọc ngày
     private JSpinner spinnerFilterDate;
     private JCheckBox chkEnableDateFilter;
 
@@ -43,26 +43,40 @@ public class ManagerView extends JFrame {
     private List<ParkingSlot> currentParkingSlots; 
     private final SimpleDateFormat dateTimeFormat = new SimpleDateFormat("HH:mm dd/MM/yyyy");
     private final DecimalFormat priceFormat = new DecimalFormat("#,###"); 
+    
+    private MainView mainView;
 
     public ManagerView() {
+        this(null);
+    }
+
+    public ManagerView(MainView mainView) {
+        this.mainView = mainView;
         setTitle("Quản Lý Chi Tiết Xe Trong Bãi");
         
-        // KÍCH THƯỚC CỬA SỔ CHÍNH 1450 x 800
         setSize(1450, 800);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout(10, 10));
 
-        // Header Panel
-        JPanel panelTitle = new JPanel();
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                closeAndReturnToMain();
+            }
+        });
+
+        JPanel panelTitle = new JPanel(new BorderLayout());
         panelTitle.setBackground(new Color(41, 128, 185));
-        JLabel lblTitle = new JLabel("QUẢN LÝ CHI TIẾT XE RA VÀO BÃI");
+        
+        JLabel lblTitle = new JLabel("QUẢN LÝ CHI TIẾT XE RA VÀO BÃI", SwingConstants.CENTER);
         lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 22));
         lblTitle.setForeground(Color.WHITE);
-        panelTitle.add(lblTitle);
+        lblTitle.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+        panelTitle.add(lblTitle, BorderLayout.CENTER);
+
         add(panelTitle, BorderLayout.NORTH);
 
-        // Form Panel (Bên trái)
         JPanel panelForm = new JPanel(new GridBagLayout());
         panelForm.setBorder(BorderFactory.createTitledBorder("Thông tin xe"));
         GridBagConstraints gbc = new GridBagConstraints();
@@ -109,7 +123,6 @@ public class ManagerView extends JFrame {
         addFormField(panelForm, gbc, 6, "Giá tiền:", txtGiaTien);
         addFormField(panelForm, gbc, 7, "Hình ảnh:", panelImgInput);
 
-        // Nút chức năng
         JPanel panelBtns = new JPanel(new GridLayout(5, 2, 6, 6));
         btnAdd = new JButton("Thêm");
         btnEdit = new JButton("Sửa");
@@ -134,13 +147,11 @@ public class ManagerView extends JFrame {
 
         add(panelForm, BorderLayout.WEST);
 
-        // Panel bên phải
         JPanel panelRight = new JPanel(new BorderLayout(5, 5));
 
         JPanel panelTools = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 8));
         panelTools.setBorder(BorderFactory.createTitledBorder("Thanh công cụ lọc & tìm kiếm"));
 
-        // 1. Cụm Sắp xếp
         btnSortId = new JButton("Xếp ID");
         btnSortBienSo = new JButton("Xếp Biển Số");
         btnSortNgay = new JButton("Xếp Ngày Vào");
@@ -152,7 +163,6 @@ public class ManagerView extends JFrame {
 
         panelTools.add(new JSeparator(JSeparator.VERTICAL));
 
-        // 2. Cụm Lọc Theo Ngày
         chkEnableDateFilter = new JCheckBox("Lọc Ngày:");
         chkEnableDateFilter.setSelected(false);
         
@@ -172,7 +182,6 @@ public class ManagerView extends JFrame {
 
         panelTools.add(new JSeparator(JSeparator.VERTICAL));
 
-        // 3. Cụm Tìm kiếm & Hủy Lọc
         txtSearchInput = new JTextField(12);
         btnSearch = new JButton("Tìm kiếm");
         btnCancelSearch = new JButton("Hủy Lọc");
@@ -184,7 +193,6 @@ public class ManagerView extends JFrame {
 
         panelRight.add(panelTools, BorderLayout.NORTH);
 
-        // Bảng danh sách xe
         String[] columns = {"ID", "Biển Số", "Loại Xe", "Màu Xe", "Thời Gian Vào", "Vị Trí", "Giá Tiền", "Hình Ảnh"};
         tableModel = new DefaultTableModel(columns, 0);
         tableVehicle = new JTable(tableModel);
@@ -196,7 +204,6 @@ public class ManagerView extends JFrame {
 
         panelRight.add(new JScrollPane(tableVehicle), BorderLayout.CENTER);
 
-        // Thống kê tổng số
         lblTotalCount = new JLabel("Tổng số xe trong bãi: 0");
         lblTotalCount.setFont(new Font("Segoe UI", Font.BOLD, 14));
         JPanel panelFooter = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -206,6 +213,17 @@ public class ManagerView extends JFrame {
         add(panelRight, BorderLayout.CENTER);
 
         initStatisticDialog();
+    }
+
+    private void closeAndReturnToMain() {
+        this.dispose();
+        if (mainView != null) {
+            mainView.setVisible(true);
+        }
+    }
+
+    public void setMainView(MainView mainView) {
+        this.mainView = mainView;
     }
 
     private void addFormField(JPanel p, GridBagConstraints gbc, int row, String label, Component comp) {
@@ -397,9 +415,6 @@ public class ManagerView extends JFrame {
         lblTotalCount.setText("Tổng số xe trong bãi: " + (list != null ? list.size() : 0));
     }
 
-    /**
-     * Phương thức bật/tắt nút Thêm (dùng cho Controller quản lý)
-     */
     public void setAddButtonEnabled(boolean enabled) {
         btnAdd.setEnabled(enabled);
     }
@@ -421,7 +436,6 @@ public class ManagerView extends JFrame {
             tableVehicle.clearSelection();
         }
 
-        // Tự động kích hoạt lại nút Thêm khi làm mới form
         setAddButtonEnabled(true);
     }
 
@@ -467,7 +481,6 @@ public class ManagerView extends JFrame {
     public String getSelectedLoaiXe() { return (String) cbLoaiXe.getSelectedItem(); }
     public void addLoaiXeChangeListener(ActionListener l) { cbLoaiXe.addActionListener(l); }
 
-    // --- ADD LISTENERS ---
     public void addAddVehicleListener(ActionListener l) { btnAdd.addActionListener(l); }
     public void addEditVehicleListener(ActionListener l) { btnEdit.addActionListener(l); }
     public void addCheckoutVehicleListener(ActionListener l) { btnCheckout.addActionListener(l); }

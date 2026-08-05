@@ -33,13 +33,21 @@ public class DashboardView extends JFrame {
     private final DecimalFormat priceFormat = new DecimalFormat("#,###");
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
+    private DefaultCategoryDataset revenueDataset;
+    private JFreeChart revenueBarChart;
+    private JComboBox<String> cbFilterType;
+    private JComboBox<Integer> cbMonth;
+    private JComboBox<Integer> cbYear;
+    private JPanel monthYearPanel;
+    private List<VehicleDetail> historyList;
+
     public DashboardView(ManagerVehicleDetail manager, MainView mainView) {
-        List<VehicleDetail> activeList = manager.getListVehicleDetails();    // Xe đang gửi trong bãi
-        List<VehicleDetail> historyList = manager.getHistoryVehicleDetails(); // Xe đã thanh toán xuất bãi
+        List<VehicleDetail> activeList = manager.getListVehicleDetails();    
+        this.historyList = manager.getHistoryVehicleDetails(); 
 
         List<VehicleDetail> allList = new ArrayList<>();
         if (activeList != null) allList.addAll(activeList);
-        if (historyList != null) allList.addAll(historyList);
+        if (this.historyList != null) allList.addAll(this.historyList);
 
         setTitle("BÁO CÁO & THỐNG KÊ CHI TIẾT BÃI XE");
         setSize(1080, 720);
@@ -48,7 +56,6 @@ public class DashboardView extends JFrame {
         setLayout(new BorderLayout(15, 15));
         getContentPane().setBackground(new Color(245, 247, 250));
 
-        // Bắt sự kiện tắt cửa sổ X -> Tự động hiện lại MainView
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -58,14 +65,12 @@ public class DashboardView extends JFrame {
             }
         });
 
-        // 1. Thẻ Thống Kê
         add(createHeaderPanel(activeList, historyList, allList), BorderLayout.NORTH);
 
-        // 2. TabbedPane chứa các biểu đồ
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setFont(new Font("Segoe UI", Font.BOLD, 13));
 
-        tabbedPane.addTab("📊 Doanh Thu 30 Ngày Gần Nhất", createRevenueBarChartPanel(historyList));
+        tabbedPane.addTab("📊 Doanh Thu & Lọc Chi Tiết", createRevenueTabWithFilterPanel());
         tabbedPane.addTab("🥧 Cơ Cấu Doanh Thu", createRevenueByVehicleTypePanel(allList));
         tabbedPane.addTab("🚗 Xe Trong Bãi Hiện Tại", createVehicleCountPanel(activeList));
 
@@ -106,17 +111,128 @@ public class DashboardView extends JFrame {
         return card;
     }
 
-    // --- TAB 1: DOANH THU THEO NGÀY XUẤT BÃI (GIỚI HẠN 30 NGÀY GẦN NHẤT) ---
-    private JPanel createRevenueBarChartPanel(List<VehicleDetail> historyList) {
-        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+    private JPanel createRevenueTabWithFilterPanel() {
+        JPanel mainTabPanel = new JPanel(new BorderLayout(10, 10));
+        mainTabPanel.setBackground(Color.WHITE);
+
+        JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 10));
+        filterPanel.setBackground(new Color(236, 240, 241));
+
+        filterPanel.add(new JLabel("Thời Gian Lọc:"));
+        cbFilterType = new JComboBox<>(new String[]{"Hôm nay", "7 ngày gần nhất", "30 ngày gần nhất", "Theo Tháng/Năm"});
+        cbFilterType.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+
+        monthYearPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        monthYearPanel.setOpaque(false);
+
+        Integer[] months = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+        cbMonth = new JComboBox<>(months);
+        Calendar cal = Calendar.getInstance();
+        cbMonth.setSelectedItem(cal.get(Calendar.MONTH) + 1);
+
+        Integer[] years = {cal.get(Calendar.YEAR) - 2, cal.get(Calendar.YEAR) - 1, cal.get(Calendar.YEAR)};
+        cbYear = new JComboBox<>(years);
+        cbYear.setSelectedItem(cal.get(Calendar.YEAR));
+
+        monthYearPanel.add(new JLabel("Tháng:"));
+        monthYearPanel.add(cbMonth);
+        monthYearPanel.add(new JLabel("Năm:"));
+        monthYearPanel.add(cbYear);
+        monthYearPanel.setVisible(false);
+
+        JButton btnFilter = new JButton("Lọc Dữ Liệu");
+        btnFilter.setBackground(new Color(52, 152, 219));
+        btnFilter.setForeground(Color.WHITE);
+        btnFilter.setFocusPainted(false);
+
+        filterPanel.add(cbFilterType);
+        filterPanel.add(monthYearPanel);
+        filterPanel.add(btnFilter);
+
+        mainTabPanel.add(filterPanel, BorderLayout.NORTH);
+
+        revenueDataset = new DefaultCategoryDataset();
+        revenueBarChart = ChartFactory.createBarChart(
+                "BIỂU ĐỒ DOANH THU",
+                "Thời Gian",
+                "Doanh Thu (VNĐ)",
+                revenueDataset,
+                PlotOrientation.VERTICAL,
+                false, true, false
+        );
+
+        revenueBarChart.setBackgroundPaint(Color.WHITE);
+        CategoryPlot plot = revenueBarChart.getCategoryPlot();
+        plot.setBackgroundPaint(new Color(250, 250, 250));
+        plot.setRangeGridlinePaint(new Color(220, 220, 220));
+
+        BarRenderer renderer = (BarRenderer) plot.getRenderer();
+        renderer.setBarPainter(new StandardBarPainter());
+        renderer.setSeriesPaint(0, new Color(46, 204, 113));
+        renderer.setShadowVisible(false);
+        renderer.setDefaultItemLabelGenerator(new StandardCategoryItemLabelGenerator("{2}", priceFormat));
+        renderer.setDefaultItemLabelsVisible(true);
+        renderer.setDefaultItemLabelFont(new Font("Segoe UI", Font.BOLD, 11));
+
+        CategoryAxis domainAxis = plot.getDomainAxis();
+        domainAxis.setCategoryLabelPositions(CategoryLabelPositions.UP_45);
+
+        mainTabPanel.add(new ChartPanel(revenueBarChart), BorderLayout.CENTER);
+
+        cbFilterType.addActionListener(e -> {
+            boolean isMonthSelected = "Theo Tháng/Năm".equals(cbFilterType.getSelectedItem());
+            monthYearPanel.setVisible(isMonthSelected);
+            mainTabPanel.revalidate();
+        });
+
+        btnFilter.addActionListener(e -> updateRevenueChartData());
+
+        cbFilterType.setSelectedItem("7 ngày gần nhất");
+        updateRevenueChartData();
+
+        return mainTabPanel;
+    }
+
+    private void updateRevenueChartData() {
+        revenueDataset.clear();
+        String option = (String) cbFilterType.getSelectedItem();
         Map<String, Double> dailyRevenue = new TreeMap<>();
+
+        Calendar now = Calendar.getInstance();
+        now.set(Calendar.HOUR_OF_DAY, 0);
+        now.set(Calendar.MINUTE, 0);
+        now.set(Calendar.SECOND, 0);
+        now.set(Calendar.MILLISECOND, 0);
 
         if (historyList != null) {
             for (VehicleDetail v : historyList) {
-                // Ưu tiên lấy ngayXuatBai, nếu null mới lấy ngayVaoBai
                 Date ngayGhiNhan = v.getNgayXuatBai() != null ? v.getNgayXuatBai() : v.getNgayVaoBai();
+                if (ngayGhiNhan == null) continue;
 
-                if (ngayGhiNhan != null) {
+                Calendar itemCal = Calendar.getInstance();
+                itemCal.setTime(ngayGhiNhan);
+                itemCal.set(Calendar.HOUR_OF_DAY, 0);
+                itemCal.set(Calendar.MINUTE, 0);
+                itemCal.set(Calendar.SECOND, 0);
+                itemCal.set(Calendar.MILLISECOND, 0);
+
+                boolean match = false;
+
+                if ("Hôm nay".equals(option)) {
+                    match = itemCal.getTimeInMillis() == now.getTimeInMillis();
+                } else if ("7 ngày gần nhất".equals(option)) {
+                    long diffInDays = (now.getTimeInMillis() - itemCal.getTimeInMillis()) / (24 * 60 * 60 * 1000);
+                    match = diffInDays >= 0 && diffInDays < 7;
+                } else if ("30 ngày gần nhất".equals(option)) {
+                    long diffInDays = (now.getTimeInMillis() - itemCal.getTimeInMillis()) / (24 * 60 * 60 * 1000);
+                    match = diffInDays >= 0 && diffInDays < 30;
+                } else if ("Theo Tháng/Năm".equals(option)) {
+                    int selectedMonth = (Integer) cbMonth.getSelectedItem();
+                    int selectedYear = (Integer) cbYear.getSelectedItem();
+                    match = (itemCal.get(Calendar.MONTH) + 1 == selectedMonth) && (itemCal.get(Calendar.YEAR) == selectedYear);
+                }
+
+                if (match) {
                     String dateStr = dateFormat.format(ngayGhiNhan);
                     dailyRevenue.put(dateStr, dailyRevenue.getOrDefault(dateStr, 0.0) + v.getGiaTien());
                 }
@@ -124,56 +240,14 @@ public class DashboardView extends JFrame {
         }
 
         if (dailyRevenue.isEmpty()) {
-            dailyRevenue.put(dateFormat.format(new Date()), 0.0);
+            revenueDataset.addValue(0, "Doanh Thu", "Không có dữ liệu");
+        } else {
+            dailyRevenue.forEach((date, amount) -> revenueDataset.addValue(amount, "Doanh Thu", date));
         }
 
-        // --- CẮT DỮ LIỆU: CHỈ GIỮ LAI TỐI ĐA 30 NGÀY MỚI NHẤT ---
-        int maxDays = 30;
-        List<String> dates = new ArrayList<>(dailyRevenue.keySet());
-        
-        if (dates.size() > maxDays) {
-            // Lấy danh sách các ngày cũ hơn mốc 30 ngày để xóa
-            List<String> datesToRemove = dates.subList(0, dates.size() - maxDays);
-            for (String oldDate : datesToRemove) {
-                dailyRevenue.remove(oldDate);
-            }
-        }
-
-        // Đổ dữ liệu đã lọc vào Dataset
-        dailyRevenue.forEach((date, amount) -> dataset.addValue(amount, "Doanh Thu", date));
-
-        JFreeChart barChart = ChartFactory.createBarChart(
-                "BIỂU ĐỒ DOANH THU 30 NGÀY GẦN NHẤT",
-                "Ngày Xuất Bãi",
-                "Doanh Thu (VNĐ)",
-                dataset,
-                PlotOrientation.VERTICAL,
-                false, true, false
-        );
-
-        barChart.setBackgroundPaint(Color.WHITE);
-        barChart.setTitle(new TextTitle("BIỂU ĐỒ DOANH THU 30 NGÀY GẦN NHẤT", new Font("Segoe UI", Font.BOLD, 16)));
-
-        CategoryPlot plot = barChart.getCategoryPlot();
-        plot.setBackgroundPaint(new Color(250, 250, 250));
-        plot.setRangeGridlinePaint(new Color(220, 220, 220));
-
-        BarRenderer renderer = (BarRenderer) plot.getRenderer();
-        renderer.setBarPainter(new StandardBarPainter());
-        renderer.setSeriesPaint(0, new Color(46, 204, 113)); // Màu xanh lá tài lộc
-        renderer.setShadowVisible(false);
-
-        renderer.setDefaultItemLabelGenerator(new StandardCategoryItemLabelGenerator("{2}", priceFormat));
-        renderer.setDefaultItemLabelsVisible(true);
-        renderer.setDefaultItemLabelFont(new Font("Segoe UI", Font.BOLD, 11));
-
-        CategoryAxis domainAxis = plot.getDomainAxis();
-        domainAxis.setCategoryLabelPositions(CategoryLabelPositions.UP_45); // Xoay 45 độ cho dễ đọc
-
-        return new ChartPanel(barChart);
+        revenueBarChart.setTitle(new TextTitle("BIỂU ĐỒ DOANH THU - " + option.toUpperCase(), new Font("Segoe UI", Font.BOLD, 16)));
     }
 
-    // --- TAB 2: CƠ CẤU DOANH THU (PIE CHART) ---
     private JPanel createRevenueByVehicleTypePanel(List<VehicleDetail> allList) {
         DefaultPieDataset dataset = new DefaultPieDataset();
 
@@ -213,7 +287,6 @@ public class DashboardView extends JFrame {
         return new ChartPanel(pieChart);
     }
 
-    // --- TAB 3: SỐ LƯỢNG XE TRONG BÃI (BAR CHART) ---
     private JPanel createVehicleCountPanel(List<VehicleDetail> activeList) {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 

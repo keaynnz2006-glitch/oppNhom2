@@ -21,6 +21,7 @@ quanlybaixe\entity\VehicleDetail.class
 quanlybaixe\action\ManagerVehicleDetail$1.class
 quanlybaixe\controller\VehicleDetailController$CancelSearchVehicleListener.class
 quanlybaixe\entity\Vehicle.class
+quanlybaixe\view\ManagerView$1.class
 quanlybaixe\controller\VehicleDetailController$SortVehicleNgayVaoBaiListener.class
 quanlybaixe\utils\DateAdapter.class
 quanlybaixe\controller\MainController.class
@@ -40,6 +41,7 @@ quanlybaixe\view\DashboardView.class
 quanlybaixe\controller\ParkingSlotController$SearchParkingSlotListener.class
 quanlybaixe\utils\FileUtils.class
 quanlybaixe\controller\MainController$ChooseDashboardListener.class
+quanlybaixe\view\ParkingSlotView$3.class
 quanlybaixe\view\ManagerView.class
 quanlybaixe\controller\LoginController$LoginListener.class
 quanlybaixe\view\ParkingSlotView.class
