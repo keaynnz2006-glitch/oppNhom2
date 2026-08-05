@@ -8,9 +8,6 @@ import quanlybaixe.view.MainView;
 import quanlybaixe.view.ManagerView;
 
 import java.util.List;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
@@ -20,17 +17,9 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import javax.swing.BorderFactory;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
 
 public class VehicleDetailController {
     private ManagerVehicleDetail managerVehicleDetail;
@@ -112,7 +101,7 @@ public class VehicleDetailController {
                 managerVehicleDetail.saveToHistory(vehicle);
                 managerVehicleDetail.delete(vehicle);
 
-                managerView.clearVehicleInfo(); // Hàm này đã bao gồm bật lại nút Thêm
+                managerView.clearVehicleInfo(); // Tự động làm sạch & bật lại nút Thêm
                 managerView.showListVehicles(managerVehicleDetail.getListVehicleDetails());
                 managerView.showCountListVehicles(managerVehicleDetail.getListVehicleDetails());
                 
@@ -126,69 +115,13 @@ public class VehicleDetailController {
     class HistoryVehicleListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            List<VehicleDetail> historyList = managerVehicleDetail.getHistoryVehicleDetails();
-            
-            JDialog historyDialog = new JDialog(managerView, "Lịch Sử Xe Đã Trả & Doanh Thu", true);
-            historyDialog.setSize(950, 480);
-            historyDialog.setLocationRelativeTo(managerView);
-            historyDialog.setLayout(new BorderLayout(10, 10));
-
-            JLabel lblTitle = new JLabel("DANH SÁCH XE ĐÃ TRẢ / XUẤT BÃI", JLabel.CENTER);
-            lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 16));
-            historyDialog.add(lblTitle, BorderLayout.NORTH);
-
-            String[] columns = {"ID", "Biển Số", "Loại Xe", "Màu Xe", "Thời Gian Vào", "Thời Gian Xuất", "Vị Trí", "Giá Tiền"};
-            DefaultTableModel model = new DefaultTableModel(columns, 0);
-            
-            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm dd/MM/yyyy");
-            DecimalFormat df = new DecimalFormat("#,### VNĐ");
-
-            double tongDoanhThu = 0.0;
-
-            if (historyList != null && !historyList.isEmpty()) {
-                for (VehicleDetail v : historyList) {
-                    tongDoanhThu += v.getGiaTien();
-                    model.addRow(new Object[]{
-                        v.getId(),
-                        v.getBienSo(),
-                        v.getLoaiXe(),
-                        v.getMauXe(),
-                        v.getNgayVaoBai() != null ? sdf.format(v.getNgayVaoBai()) : "",
-                        v.getNgayXuatBai() != null ? sdf.format(v.getNgayXuatBai()) : "",
-                        v.getViTriDo(),
-                        df.format(v.getGiaTien())
-                    });
-                }
-            }
-
-            JTable historyTable = new JTable(model);
-            
-            DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
-            rightRenderer.setHorizontalAlignment(JLabel.RIGHT);
-            historyTable.getColumnModel().getColumn(7).setCellRenderer(rightRenderer);
-
-            historyDialog.add(new JScrollPane(historyTable), BorderLayout.CENTER);
-            
-            JPanel panelFooter = new JPanel(new BorderLayout());
-            panelFooter.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-
-            JLabel lblTotalCount = new JLabel("Tổng số lượt trả: " + (historyList != null ? historyList.size() : 0));
-            lblTotalCount.setFont(new Font("Segoe UI", Font.ITALIC, 13));
-
-            JLabel lblRevenue = new JLabel("TỔNG DOANH THU: " + df.format(tongDoanhThu));
-            lblRevenue.setFont(new Font("Segoe UI", Font.BOLD, 14));
-            lblRevenue.setForeground(new Color(39, 174, 96));
-
-            panelFooter.add(lblTotalCount, BorderLayout.WEST);
-            panelFooter.add(lblRevenue, BorderLayout.EAST);
-
-            historyDialog.add(panelFooter, BorderLayout.SOUTH);
-
-            historyDialog.setVisible(true);
+            HistoryController historyController = new HistoryController(managerView, managerVehicleDetail);
+            historyController.showHistoryView();
         }
     }
 
     class AddVehicleListener implements ActionListener {
+        @Override
         public void actionPerformed(ActionEvent e) {
             VehicleDetail vehicle = managerView.getVehicleInfo();
             if (vehicle != null) {
@@ -201,7 +134,7 @@ public class VehicleDetailController {
                 managerView.showListVehicles(managerVehicleDetail.getListVehicleDetails());
                 managerView.showCountListVehicles(managerVehicleDetail.getListVehicleDetails());
                 managerView.setParkingSlotList(managerParkingSlot.getListParkingSlots());
-                managerView.clearVehicleInfo(); // Reset lại form & tự bật lại nút Thêm
+                managerView.clearVehicleInfo();
                 
                 managerView.showMessage("Thêm thông tin xe thành công!");
             }
@@ -209,6 +142,7 @@ public class VehicleDetailController {
     }
     
     class EditVehicleListener implements ActionListener {
+        @Override
         public void actionPerformed(ActionEvent e) {
             VehicleDetail vehicle = managerView.getVehicleInfo();
             if (vehicle != null) {
@@ -237,7 +171,7 @@ public class VehicleDetailController {
                 managerView.showListVehicles(managerVehicleDetail.getListVehicleDetails());
                 managerView.showCountListVehicles(managerVehicleDetail.getListVehicleDetails());
                 managerView.setParkingSlotList(managerParkingSlot.getListParkingSlots());
-                managerView.clearVehicleInfo(); // Reset form & tự bật lại nút Thêm
+                managerView.clearVehicleInfo();
                 
                 managerView.showMessage("Cập nhật thông tin xe thành công!");
             }
@@ -245,6 +179,7 @@ public class VehicleDetailController {
     }
     
     class DeleteVehicleListener implements ActionListener {
+        @Override
         public void actionPerformed(ActionEvent e) {
             VehicleDetail vehicle = managerView.getVehicleInfo();
             if (vehicle != null) {
@@ -254,7 +189,7 @@ public class VehicleDetailController {
                     managerParkingSlot.updateSlotStatus(vehicle.getViTriDo(), false);
                 }
 
-                managerView.clearVehicleInfo(); // Reset form & tự bật lại nút Thêm
+                managerView.clearVehicleInfo();
                 managerView.showListVehicles(managerVehicleDetail.getListVehicleDetails());
                 managerView.showCountListVehicles(managerVehicleDetail.getListVehicleDetails());
                 managerView.setParkingSlotList(managerParkingSlot.getListParkingSlots());
@@ -264,18 +199,21 @@ public class VehicleDetailController {
     }
     
     class ImageVehicleListener implements ActionListener {
+        @Override
         public void actionPerformed(ActionEvent e) {
             managerView.chooseVehicleImage();
         }
     }
 
     class ClearVehicleListener implements ActionListener {
+        @Override
         public void actionPerformed(ActionEvent e) {
-            managerView.clearVehicleInfo(); // Hàm này đã bao gồm setAddButtonEnabled(true)
+            managerView.clearVehicleInfo();
         }
     }
 
     class SortVehicleBienSoListener implements ActionListener {
+        @Override
         public void actionPerformed(ActionEvent e) {
             managerVehicleDetail.sortDetailsByBienSo();
             managerView.showListVehicles(managerVehicleDetail.getListVehicleDetails());
@@ -283,6 +221,7 @@ public class VehicleDetailController {
     }
     
     class SortVehicleNgayVaoBaiListener implements ActionListener {
+        @Override
         public void actionPerformed(ActionEvent e) {
             managerVehicleDetail.sortDetailsByNgayVaoBai();
             managerView.showListVehicles(managerVehicleDetail.getListVehicleDetails());
@@ -290,6 +229,7 @@ public class VehicleDetailController {
     }
     
     class SortVehicleIDListener implements ActionListener {
+        @Override
         public void actionPerformed(ActionEvent e) {
             managerVehicleDetail.sortDetailsByID();
             managerView.showListVehicles(managerVehicleDetail.getListVehicleDetails());
@@ -297,12 +237,12 @@ public class VehicleDetailController {
     }
     
     class StatisticViewListener implements ActionListener {
+        @Override
         public void actionPerformed(ActionEvent e) {
             managerView.displayStatisticView();
         }
     }
 
-    // --- XỬ LÝ TÌM KIẾM + LỌC NGÀY KẾT HỢP ---
     class SearchVehicleListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -319,7 +259,6 @@ public class VehicleDetailController {
             DecimalFormat dfFormated = new DecimalFormat("#,###");
 
             List<VehicleDetail> filteredList = allVehicles.stream().filter(v -> {
-                // 1. Nếu checkbox "Lọc Ngày" được bật -> Bắt buộc xe phải thuộc ngày đã chọn
                 if (isFilterDate) {
                     if (v.getNgayVaoBai() == null) return false;
                     String vehicleDateStr = sdfCompare.format(v.getNgayVaoBai());
@@ -328,12 +267,10 @@ public class VehicleDetailController {
                     }
                 }
 
-                // 2. Nếu không có từ khóa tìm kiếm -> Lấy tất cả xe thỏa mãn điều kiện ngày
                 if (keyword.isEmpty()) {
                     return true;
                 }
 
-                // 3. Nếu có từ khóa -> Lọc tiếp từ khóa khớp các trường dữ liệu
                 String idStr = String.valueOf(v.getId());
                 String bienSo = v.getBienSo() != null ? v.getBienSo().toLowerCase() : "";
                 String loaiXe = v.getLoaiXe() != null ? v.getLoaiXe().toLowerCase() : "";
@@ -354,7 +291,6 @@ public class VehicleDetailController {
                         || giaTienFormatted.contains(keyword);
             }).collect(Collectors.toList());
 
-            // Hiển thị kết quả lên giao diện
             managerView.showListVehicles(filteredList);
             managerView.showCountListVehicles(filteredList);
 
@@ -372,10 +308,10 @@ public class VehicleDetailController {
         }
     }
 
-    // --- HỦY LỌC TÌM KIẾM ---
     class CancelSearchVehicleListener implements ActionListener {
+        @Override
         public void actionPerformed(ActionEvent e) {
-            managerView.cancelSearchVehicle(); // Reset ô chữ + Bỏ tích lọc ngày từ View
+            managerView.cancelSearchVehicle();
             List<VehicleDetail> fullList = managerVehicleDetail.getListVehicleDetails();
             managerView.showListVehicles(fullList);
             managerView.showCountListVehicles(fullList);
@@ -383,6 +319,7 @@ public class VehicleDetailController {
     }
     
     class UndoListener implements ActionListener {
+        @Override
         public void actionPerformed(ActionEvent e) {
             mainView = new MainView();
             MainController mainController = new MainController(mainView);
@@ -391,13 +328,12 @@ public class VehicleDetailController {
         }
     }
 
-    // --- XỬ LÝ SỰ KIỆN CLICK CHỌN XE TỪ BẢNG ---
     class ListVehicleSelectionListener implements ListSelectionListener {
+        @Override
         public void valueChanged(ListSelectionEvent e) {
             if (!e.getValueIsAdjusting()) {
                 try {
                     managerView.fillVehicleFromSelectedRow();
-                    // VÔ HIỆU HÓA NÚT THÊM KHI ĐÃ CHỌN XE TỪ BẢNG
                     managerView.setAddButtonEnabled(false);
                 } catch (ParseException ex) {
                     Logger.getLogger(VehicleDetailController.class.getName()).log(Level.SEVERE, null, ex);
@@ -407,6 +343,7 @@ public class VehicleDetailController {
     }
     
     class StatisticVehicleTypeListener implements ActionListener {
+        @Override
         public void actionPerformed(ActionEvent e) {
             managerView.displayStatisticView();
             managerView.showStatisticTypeVehicles(managerVehicleDetail.getListVehicleDetails());
@@ -414,8 +351,9 @@ public class VehicleDetailController {
     }
 
     class StatisticClearListener implements ActionListener {
+        @Override
         public void actionPerformed(ActionEvent e) {
             managerView.clearStatisticView();
         }
     }
-}
+}   

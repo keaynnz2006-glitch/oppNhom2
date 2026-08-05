@@ -5,13 +5,19 @@ import quanlybaixe.entity.VehicleDetail;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -28,7 +34,10 @@ public class ManagerView extends JFrame {
     private JComboBox<String> cbLoaiXe;
     private JButton btnSelectSlot;
     private JLabel lblTotalCount, lblStatistic;
-    
+    private JLabel lblImagePreview; // Khung hiển thị ảnh
+
+    private JButton btnZoomImg, btnDeleteImg; // Nút Phóng to & Xóa ảnh
+
     private JTextField txtSearchInput;
 
     private JButton btnAdd, btnEdit, btnDelete, btnCheckout, btnClear, btnSortId, btnSortBienSo, btnSortNgay, btnSearch, btnCancelSearch, btnChooseImg, btnUndo, btnStatistic, btnStatisticType, btnStatisticClear, btnHistory, btnFilterDate;
@@ -54,7 +63,7 @@ public class ManagerView extends JFrame {
         this.mainView = mainView;
         setTitle("Quản Lý Chi Tiết Xe Trong Bãi");
         
-        setSize(1450, 800);
+        setSize(1450, 850);
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout(10, 10));
@@ -80,7 +89,7 @@ public class ManagerView extends JFrame {
         JPanel panelForm = new JPanel(new GridBagLayout());
         panelForm.setBorder(BorderFactory.createTitledBorder("Thông tin xe"));
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(6, 6, 6, 6);
+        gbc.insets = new Insets(4, 6, 4, 6);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         txtId = new JTextField(15); txtId.setEditable(false);
@@ -109,10 +118,37 @@ public class ManagerView extends JFrame {
         txtGiaTien = new JTextField(15);
         txtHinhAnh = new JTextField(10); txtHinhAnh.setEditable(false);
 
-        btnChooseImg = new JButton("Chọn ảnh");
+        btnChooseImg = new JButton("Chọn...");
         JPanel panelImgInput = new JPanel(new BorderLayout(5, 0));
         panelImgInput.add(txtHinhAnh, BorderLayout.CENTER);
         panelImgInput.add(btnChooseImg, BorderLayout.EAST);
+
+        // Frame hiển thị ảnh preview
+        lblImagePreview = new JLabel("Chưa có ảnh", SwingConstants.CENTER);
+        lblImagePreview.setPreferredSize(new Dimension(180, 120));
+        lblImagePreview.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
+        lblImagePreview.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        lblImagePreview.setToolTipText("Bấm vào để phóng to ảnh");
+        lblImagePreview.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                zoomImage();
+            }
+        });
+
+        // Nút thao tác ảnh
+        btnZoomImg = new JButton("Phóng to");
+        btnDeleteImg = new JButton("Xóa ảnh");
+        btnZoomImg.addActionListener(e -> zoomImage());
+        btnDeleteImg.addActionListener(e -> deleteImageFile());
+
+        JPanel panelImgActionBtns = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 2));
+        panelImgActionBtns.add(btnZoomImg);
+        panelImgActionBtns.add(btnDeleteImg);
+
+        JPanel panelPreviewContainer = new JPanel(new BorderLayout(0, 5));
+        panelPreviewContainer.add(lblImagePreview, BorderLayout.CENTER);
+        panelPreviewContainer.add(panelImgActionBtns, BorderLayout.SOUTH);
 
         addFormField(panelForm, gbc, 0, "ID:", txtId);
         addFormField(panelForm, gbc, 1, "Biển số xe:", txtBienSo);
@@ -122,10 +158,11 @@ public class ManagerView extends JFrame {
         addFormField(panelForm, gbc, 5, "Vị trí đỗ:", panelSlotInput);
         addFormField(panelForm, gbc, 6, "Giá tiền:", txtGiaTien);
         addFormField(panelForm, gbc, 7, "Hình ảnh:", panelImgInput);
+        addFormField(panelForm, gbc, 8, "Xem trước:", panelPreviewContainer);
 
-        JPanel panelBtns = new JPanel(new GridLayout(5, 2, 6, 6));
+        JPanel panelBtns = new JPanel(new GridLayout(4, 2, 6, 6));
         btnAdd = new JButton("Thêm");
-        btnEdit = new JButton("Sửa");
+        btnEdit = new JButton(" Xác NhậnSửa");
         btnCheckout = new JButton("Trả xe");
         btnDelete = new JButton("Xóa");
         btnClear = new JButton("Làm mới");
@@ -142,7 +179,7 @@ public class ManagerView extends JFrame {
         panelBtns.add(btnHistory);
         panelBtns.add(btnUndo);
 
-        gbc.gridx = 0; gbc.gridy = 8; gbc.gridwidth = 2;
+        gbc.gridx = 0; gbc.gridy = 9; gbc.gridwidth = 2;
         panelForm.add(panelBtns, gbc);
 
         add(panelForm, BorderLayout.WEST);
@@ -233,6 +270,120 @@ public class ManagerView extends JFrame {
         p.add(comp, gbc);
     }
 
+    // Load và scale ảnh vừa khung hiển thị
+    public void displayImage(String imagePath) {
+        if (imagePath != null && !imagePath.trim().isEmpty()) {
+            File imgFile = new File(imagePath);
+            if (imgFile.exists()) {
+                ImageIcon icon = new ImageIcon(imgFile.getAbsolutePath());
+                Image img = icon.getImage().getScaledInstance(180, 120, Image.SCALE_SMOOTH);
+                lblImagePreview.setIcon(new ImageIcon(img));
+                lblImagePreview.setText("");
+                return;
+            }
+        }
+        lblImagePreview.setIcon(null);
+        lblImagePreview.setText("Chưa có ảnh / Lỗi ảnh");
+    }
+
+    // Phóng to ảnh trong Dialog riêng
+    public void zoomImage() {
+        String path = txtHinhAnh.getText().trim();
+        if (path.isEmpty()) {
+            showMessage("Chưa chọn hình ảnh để phóng to!");
+            return;
+        }
+
+        File imgFile = new File(path);
+        if (!imgFile.exists()) {
+            showMessage("File ảnh không tồn tại!");
+            return;
+        }
+
+        JDialog zoomDialog = new JDialog(this, "Xem Ảnh Kích Thước Lớn", true);
+        zoomDialog.setSize(700, 550);
+        zoomDialog.setLocationRelativeTo(this);
+
+        ImageIcon icon = new ImageIcon(imgFile.getAbsolutePath());
+        Image img = icon.getImage().getScaledInstance(650, 450, Image.SCALE_SMOOTH);
+        JLabel lblFullImage = new JLabel(new ImageIcon(img), SwingConstants.CENTER);
+
+        zoomDialog.add(new JScrollPane(lblFullImage), BorderLayout.CENTER);
+        zoomDialog.setVisible(true);
+    }
+
+    // Xóa file ảnh vật lý và xóa đường dẫn
+    public void deleteImageFile() {
+        String path = txtHinhAnh.getText().trim();
+        if (path.isEmpty()) {
+            showMessage("Chưa có file ảnh nào được chọn!");
+            return;
+        }
+
+        int confirm = JOptionPane.showConfirmDialog(
+            this, 
+            "Bạn có chắc muốn xóa file ảnh này khỏi hệ thống?", 
+            "Xác nhận xóa ảnh", 
+            JOptionPane.YES_NO_OPTION
+        );
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            File imgFile = new File(path);
+            if (imgFile.exists()) {
+                boolean deleted = imgFile.delete();
+                if (deleted) {
+                    showMessage("Đã xóa file ảnh thành công!");
+                } else {
+                    showMessage("Không thể xóa file ảnh (file có thể đang được ứng dụng khác sử dụng)!");
+                }
+            } else {
+                showMessage("File ảnh không tồn tại trên đĩa!");
+            }
+
+            // Dọn dẹp ô text và preview
+            txtHinhAnh.setText("");
+            displayImage("");
+        }
+    }
+
+    // Chọn ảnh và tự động copy vào thư mục 'image_vehicles/'
+    public void chooseVehicleImage() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Chọn hình ảnh xe");
+        fileChooser.setFileFilter(new FileNameExtensionFilter("Hình ảnh (JPG, PNG, JPEG)", "jpg", "jpeg", "png"));
+        
+        int result = fileChooser.showOpenDialog(this);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            
+            try {
+                File dir = new File("image_vehicles");
+                if (!dir.exists()) {
+                    dir.mkdirs();
+                }
+
+                String fileName = selectedFile.getName();
+                String extension = "";
+                int i = fileName.lastIndexOf('.');
+                if (i > 0) {
+                    extension = fileName.substring(i);
+                }
+
+                String newFileName = "xe_" + System.currentTimeMillis() + extension;
+                File destFile = new File(dir, newFileName);
+
+                Files.copy(selectedFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+                String savedPath = destFile.getPath();
+                txtHinhAnh.setText(savedPath);
+                displayImage(savedPath);
+
+            } catch (IOException ex) {
+                showMessage("Không thể lưu ảnh vào thư mục dự án: " + ex.getMessage());
+            }
+        }
+    }
+
     private void showSlotPickerDialog() {
         if (currentParkingSlots == null || currentParkingSlots.isEmpty()) {
             showMessage("Không có dữ liệu vị trí đỗ!");
@@ -240,7 +391,6 @@ public class ManagerView extends JFrame {
         }
 
         slotPickerDialog = new JDialog(this, "Sơ Đồ Chọn Vị Trí Đỗ Theo Khu", true);
-        
         slotPickerDialog.setSize(800, 550);
         slotPickerDialog.setLocationRelativeTo(this);
         slotPickerDialog.setLayout(new BorderLayout(10, 10));
@@ -319,7 +469,6 @@ public class ManagerView extends JFrame {
 
     private void initStatisticDialog() {
         statisticDialog = new JDialog(this, "Thống Kê Bãi Xe", true);
-        
         statisticDialog.setSize(450, 300);
         statisticDialog.setLayout(new BorderLayout(10, 10));
         statisticDialog.setLocationRelativeTo(this);
@@ -370,44 +519,48 @@ public class ManagerView extends JFrame {
         txtViTriSelected.setText(v.getViTriDo() != null ? v.getViTriDo() : "");
         txtGiaTien.setText(priceFormat.format(v.getGiaTien()));
         txtHinhAnh.setText(v.getHinhAnh());
+        displayImage(v.getHinhAnh());
     }
 
     public void showListVehicles(List<VehicleDetail> list) {
         tableModel.setRowCount(0);
-        for (VehicleDetail v : list) {
-            tableModel.addRow(new Object[]{
-                v.getId(), v.getBienSo(), v.getLoaiXe(), v.getMauXe(),
-                v.getNgayVaoBai() != null ? dateTimeFormat.format(v.getNgayVaoBai()) : "",
-                v.getViTriDo(), 
-                priceFormat.format(v.getGiaTien()),
-                v.getHinhAnh()
-            });
+        if (list != null) {
+            for (VehicleDetail v : list) {
+                tableModel.addRow(new Object[]{
+                    v.getId(), 
+                    v.getBienSo(), 
+                    v.getLoaiXe(), 
+                    v.getMauXe(),
+                    v.getNgayVaoBai() != null ? dateTimeFormat.format(v.getNgayVaoBai()) : "",
+                    v.getViTriDo() != null ? v.getViTriDo() : "", 
+                    priceFormat.format(v.getGiaTien()),
+                    v.getHinhAnh() != null ? v.getHinhAnh() : ""
+                });
+            }
         }
     }
 
     public void fillVehicleFromSelectedRow() throws ParseException {
         int row = tableVehicle.getSelectedRow();
         if (row >= 0) {
-            txtId.setText(tableModel.getValueAt(row, 0).toString());
-            txtBienSo.setText(tableModel.getValueAt(row, 1).toString());
+            txtId.setText(tableModel.getValueAt(row, 0) != null ? tableModel.getValueAt(row, 0).toString() : "");
+            txtBienSo.setText(tableModel.getValueAt(row, 1) != null ? tableModel.getValueAt(row, 1).toString() : "");
             
             Object loaiXeObj = tableModel.getValueAt(row, 2);
             if (loaiXeObj != null) cbLoaiXe.setSelectedItem(loaiXeObj.toString());
 
-            txtMauXe.setText(tableModel.getValueAt(row, 3).toString());
-            txtNgayVao.setText(tableModel.getValueAt(row, 4).toString());
+            txtMauXe.setText(tableModel.getValueAt(row, 3) != null ? tableModel.getValueAt(row, 3).toString() : "");
+            txtNgayVao.setText(tableModel.getValueAt(row, 4) != null ? tableModel.getValueAt(row, 4).toString() : "");
             
             Object viTriObj = tableModel.getValueAt(row, 5);
             txtViTriSelected.setText(viTriObj != null ? viTriObj.toString() : "");
 
             Object giaTienObj = tableModel.getValueAt(row, 6);
-            if (giaTienObj != null) {
-                txtGiaTien.setText(giaTienObj.toString());
-            } else {
-                txtGiaTien.setText("0");
-            }
+            txtGiaTien.setText(giaTienObj != null ? giaTienObj.toString() : "0");
 
-            txtHinhAnh.setText(tableModel.getValueAt(row, 7) != null ? tableModel.getValueAt(row, 7).toString() : "");
+            String imgPath = tableModel.getValueAt(row, 7) != null ? tableModel.getValueAt(row, 7).toString() : "";
+            txtHinhAnh.setText(imgPath);
+            displayImage(imgPath);
         }
     }
 
@@ -431,20 +584,13 @@ public class ManagerView extends JFrame {
         txtViTriSelected.setText("");
         txtGiaTien.setText(""); 
         txtHinhAnh.setText("");
+        displayImage("");
 
         if (tableVehicle != null) {
             tableVehicle.clearSelection();
         }
 
         setAddButtonEnabled(true);
-    }
-
-    public void chooseVehicleImage() {
-        JFileChooser fileChooser = new JFileChooser();
-        if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-            File selectedFile = fileChooser.getSelectedFile();
-            txtHinhAnh.setText(selectedFile.getAbsolutePath());
-        }
     }
 
     public String validateSearch() { return txtSearchInput.getText().trim(); }

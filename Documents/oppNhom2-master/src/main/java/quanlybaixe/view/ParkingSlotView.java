@@ -71,7 +71,7 @@ public class ParkingSlotView extends JFrame {
         txtId.setEditable(false);
         txtTenViTri = new JTextField(15);
 
-        String[] loaiSlotOptions = {"Xe máy", "Ô tô"};
+        String[] loaiSlotOptions = {"Xe máy", "Ô tô", "Khác"};
         cbLoaiSlot = new JComboBox<>(loaiSlotOptions);
         cbLoaiSlot.addActionListener(e -> autoFillPrice());
 
@@ -217,6 +217,8 @@ public class ParkingSlotView extends JFrame {
                 txtGiaTien.setText("5000");
             } else if ("Ô tô".equalsIgnoreCase(selectedType)) {
                 txtGiaTien.setText("10000");
+            } else if ("Khác".equalsIgnoreCase(selectedType)) {
+                txtGiaTien.setText("0");
             }
         }
     }
@@ -246,9 +248,14 @@ public class ParkingSlotView extends JFrame {
         if (slot == null) return;
         txtId.setText(String.valueOf(slot.getId()));
         txtTenViTri.setText(slot.getTenViTri());
+        
         if (slot.getLoaiSlot() != null) {
             cbLoaiSlot.setSelectedItem(slot.getLoaiSlot());
+            if (cbLoaiSlot.getSelectedIndex() == -1) {
+                cbLoaiSlot.setSelectedItem("Khác");
+            }
         }
+        
         txtGiaTien.setText(String.format("%.0f", slot.getGiaTien()));
         chkTrangThai.setSelected(slot.isTrangThai());
         txtGhiChu.setText(slot.getGhiChu());
@@ -280,6 +287,7 @@ public class ParkingSlotView extends JFrame {
                 for (ParkingSlot slot : list) {
                     if (slot.getId() == selectedId) {
                         showParkingSlot(slot);
+                        setAddButtonEnabled(false); // Làm mờ/vô hiệu hóa nút Thêm khi đã chọn dòng
                         break;
                     }
                 }
@@ -303,6 +311,11 @@ public class ParkingSlotView extends JFrame {
         chkTrangThai.setSelected(false);
         txtGhiChu.setText("");
         tableSlot.clearSelection();
+        setAddButtonEnabled(true); // Bật lại nút Thêm khi bấm "Nhập lại"
+    }
+
+    public void setAddButtonEnabled(boolean enabled) {
+        btnAdd.setEnabled(enabled);
     }
 
     public int getChooseSelectSort() {

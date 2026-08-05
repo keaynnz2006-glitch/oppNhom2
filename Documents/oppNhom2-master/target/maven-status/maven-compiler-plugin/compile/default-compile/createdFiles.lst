@@ -2,6 +2,7 @@ quanlybaixe\controller\VehicleDetailController$SortVehicleIDListener.class
 quanlybaixe\controller\VehicleDetailController$CheckoutVehicleListener.class
 quanlybaixe\entity\ParkingSlotXML.class
 quanlybaixe\action\ManagerVehicleDetail$3.class
+quanlybaixe\controller\HistoryController$FilterListener.class
 quanlybaixe\controller\ParkingSlotController$ListParkingSlotsSelectionListener.class
 quanlybaixe\entity\ParkingSlot.class
 quanlybaixe\controller\ParkingSlotController$UndoListener.class
@@ -25,6 +26,7 @@ quanlybaixe\view\ManagerView$1.class
 quanlybaixe\controller\VehicleDetailController$SortVehicleNgayVaoBaiListener.class
 quanlybaixe\utils\DateAdapter.class
 quanlybaixe\controller\MainController.class
+quanlybaixe\view\HistoryView$1.class
 quanlybaixe\action\ManagerParkingSlot$3.class
 quanlybaixe\controller\VehicleDetailController$ImageVehicleListener.class
 quanlybaixe\controller\VehicleDetailController$SearchVehicleListener.class
@@ -32,12 +34,14 @@ quanlybaixe\controller\LoginController.class
 quanlybaixe\controller\VehicleDetailController$SortVehicleBienSoListener.class
 quanlybaixe\action\ManagerVehicleDetail.class
 quanlybaixe\controller\VehicleDetailController$UndoListener.class
+quanlybaixe\view\ManagerView$2.class
 quanlybaixe\view\ParkingSlotView$2.class
 quanlybaixe\controller\VehicleDetailController$HistoryVehicleListener.class
 quanlybaixe\controller\MainController$ChooseVehicleDetailListener.class
 quanlybaixe\controller\VehicleDetailController$ClearVehicleListener.class
 quanlybaixe\controller\ParkingSlotController.class
 quanlybaixe\view\DashboardView.class
+quanlybaixe\controller\HistoryController$ResetListener.class
 quanlybaixe\controller\ParkingSlotController$SearchParkingSlotListener.class
 quanlybaixe\utils\FileUtils.class
 quanlybaixe\controller\MainController$ChooseDashboardListener.class
@@ -61,5 +65,6 @@ quanlybaixe\action\CheckLogin.class
 quanlybaixe\quanly\QuanLyBaiXe.class
 quanlybaixe\controller\ParkingSlotController$DeleteParkingSlotListener.class
 quanlybaixe\action\ManagerParkingSlot.class
+quanlybaixe\controller\HistoryController.class
 quanlybaixe\controller\VehicleDetailController.class
 quanlybaixe\controller\ParkingSlotController$SortParkingSlotsListener.class
