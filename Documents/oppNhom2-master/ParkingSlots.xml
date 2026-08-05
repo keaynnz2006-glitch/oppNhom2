@@ -5,7 +5,7 @@
         <tenViTri>A01</tenViTri>
         <loaiSlot>Xe máy</loaiSlot>
         <giaTien>5000.0</giaTien>
-        <trangThai>false</trangThai>
+        <trangThai>true</trangThai>
         <ghiChu></ghiChu>
     </ParkingSlot>
     <ParkingSlot>
@@ -61,7 +61,7 @@
         <tenViTri>B04</tenViTri>
         <loaiSlot>Ô tô</loaiSlot>
         <giaTien>10000.0</giaTien>
-        <trangThai>false</trangThai>
+        <trangThai>true</trangThai>
         <ghiChu></ghiChu>
     </ParkingSlot>
     <ParkingSlot>

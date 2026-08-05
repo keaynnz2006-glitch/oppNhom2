@@ -30,4 +30,24 @@
         <viTriDo>B02</viTriDo>
         <giaTien>10000.0</giaTien>
     </VehicleDetail>
+    <VehicleDetail>
+        <id>6</id>
+        <bienSo>823HG</bienSo>
+        <loaiXe>Ô tô</loaiXe>
+        <mauXe>ĐEN</mauXe>
+        <ngayVaoBai>06:48 04/08/2026</ngayVaoBai>
+        <hinhAnh></hinhAnh>
+        <viTriDo>B04</viTriDo>
+        <giaTien>10000.0</giaTien>
+    </VehicleDetail>
+    <VehicleDetail>
+        <id>7</id>
+        <bienSo>82US</bienSo>
+        <loaiXe>Xe máy</loaiXe>
+        <mauXe>VÀNG</mauXe>
+        <ngayVaoBai>06:50 04/08/2026</ngayVaoBai>
+        <hinhAnh></hinhAnh>
+        <viTriDo>A01</viTriDo>
+        <giaTien>5000.0</giaTien>
+    </VehicleDetail>
 </VehicleDetails>

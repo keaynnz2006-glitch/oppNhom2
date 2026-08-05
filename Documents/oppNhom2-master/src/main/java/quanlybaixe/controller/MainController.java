@@ -17,7 +17,7 @@ public class MainController {
 
     public MainController(MainView view) {
         this.mainView = view;
-        this.managerVehicleDetail = new ManagerVehicleDetail(); // Khởi tạo class quản lý dữ liệu xe
+        this.managerVehicleDetail = new ManagerVehicleDetail(); 
         
         this.mainView.addChooseVehicleDetailListener(new ChooseVehicleDetailListener());
         this.mainView.addChooseParkingSlotListener(new ChooseParkingSlotListener());
@@ -54,10 +54,10 @@ public class MainController {
     class ChooseDashboardListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            // Truyền cả managerVehicleDetail và mainView vào DashboardView
+            
             DashboardView dashboard = new DashboardView(managerVehicleDetail, mainView);
             dashboard.setVisible(true);
-            mainView.setVisible(false); // Ẩn MainView đi
+            mainView.setVisible(false);
         }
     }
 }

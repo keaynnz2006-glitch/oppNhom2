@@ -22,7 +22,7 @@ public class VehicleDetail implements Serializable {
     private Date ngayVaoBai;
 
     @XmlJavaTypeAdapter(DateAdapter.class)
-    private Date ngayXuatBai; // Bổ sung thời gian xuất bãi
+    private Date ngayXuatBai; 
 
     private String hinhAnh;
     private String viTriDo;
