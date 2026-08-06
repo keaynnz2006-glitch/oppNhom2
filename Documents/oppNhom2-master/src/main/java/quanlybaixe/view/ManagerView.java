@@ -2,6 +2,7 @@ package quanlybaixe.view;
 
 import quanlybaixe.entity.ParkingSlot;
 import quanlybaixe.entity.VehicleDetail;
+import com.toedter.calendar.JDateChooser; 
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionListener;
@@ -42,7 +43,8 @@ public class ManagerView extends JFrame {
 
     private JButton btnAdd, btnEdit, btnDelete, btnCheckout, btnClear, btnSortId, btnSortBienSo, btnSortNgay, btnSearch, btnCancelSearch, btnChooseImg, btnUndo, btnStatistic, btnStatisticType, btnStatisticClear, btnHistory, btnFilterDate;
 
-    private JSpinner spinnerFilterDate;
+    // Đổi JSpinner sang JDateChooser của JCalendar
+    private JDateChooser dateChooserFilter;
     private JCheckBox chkEnableDateFilter;
 
     private JTable tableVehicle;
@@ -95,7 +97,8 @@ public class ManagerView extends JFrame {
         txtId = new JTextField(15); txtId.setEditable(false);
         txtBienSo = new JTextField(15);
         
-        String[] loaiXeOptions = {"Xe máy", "Ô tô"};
+        // Tùy chọn Loại xe
+        String[] loaiXeOptions = {"Xe máy", "Ô tô", "Khác"};
         cbLoaiXe = new JComboBox<>(loaiXeOptions);
 
         txtMauXe = new JTextField(15);
@@ -162,7 +165,7 @@ public class ManagerView extends JFrame {
 
         JPanel panelBtns = new JPanel(new GridLayout(4, 2, 6, 6));
         btnAdd = new JButton("Thêm");
-        btnEdit = new JButton(" Xác NhậnSửa");
+        btnEdit = new JButton(" Xác Nhận Sửa");
         btnCheckout = new JButton("Trả xe");
         btnDelete = new JButton("Xóa");
         btnClear = new JButton("Làm mới");
@@ -203,18 +206,18 @@ public class ManagerView extends JFrame {
         chkEnableDateFilter = new JCheckBox("Lọc Ngày:");
         chkEnableDateFilter.setSelected(false);
         
-        SpinnerDateModel dateModel = new SpinnerDateModel();
-        spinnerFilterDate = new JSpinner(dateModel);
-        JSpinner.DateEditor dateEditor = new JSpinner.DateEditor(spinnerFilterDate, "dd/MM/yyyy");
-        spinnerFilterDate.setEditor(dateEditor);
-        spinnerFilterDate.setEnabled(false);
+        // Khởi tạo JDateChooser từ thư viện JCalendar
+        dateChooserFilter = new JDateChooser();
+        dateChooserFilter.setDateFormatString("dd/MM/yyyy");
+        dateChooserFilter.setPreferredSize(new Dimension(130, 24));
+        dateChooserFilter.setEnabled(false); // Mặc định khóa
 
-        chkEnableDateFilter.addActionListener(e -> spinnerFilterDate.setEnabled(chkEnableDateFilter.isSelected()));
+        chkEnableDateFilter.addActionListener(e -> dateChooserFilter.setEnabled(chkEnableDateFilter.isSelected()));
 
         btnFilterDate = new JButton("Lọc Ngày");
 
         panelTools.add(chkEnableDateFilter);
-        panelTools.add(spinnerFilterDate);
+        panelTools.add(dateChooserFilter);
         panelTools.add(btnFilterDate);
 
         panelTools.add(new JSeparator(JSeparator.VERTICAL));
@@ -270,7 +273,6 @@ public class ManagerView extends JFrame {
         p.add(comp, gbc);
     }
 
-    // Load và scale ảnh vừa khung hiển thị
     public void displayImage(String imagePath) {
         if (imagePath != null && !imagePath.trim().isEmpty()) {
             File imgFile = new File(imagePath);
@@ -286,7 +288,6 @@ public class ManagerView extends JFrame {
         lblImagePreview.setText("Chưa có ảnh / Lỗi ảnh");
     }
 
-    // Phóng to ảnh trong Dialog riêng
     public void zoomImage() {
         String path = txtHinhAnh.getText().trim();
         if (path.isEmpty()) {
@@ -312,7 +313,6 @@ public class ManagerView extends JFrame {
         zoomDialog.setVisible(true);
     }
 
-    // Xóa file ảnh vật lý và xóa đường dẫn
     public void deleteImageFile() {
         String path = txtHinhAnh.getText().trim();
         if (path.isEmpty()) {
@@ -340,13 +340,11 @@ public class ManagerView extends JFrame {
                 showMessage("File ảnh không tồn tại trên đĩa!");
             }
 
-            // Dọn dẹp ô text và preview
             txtHinhAnh.setText("");
             displayImage("");
         }
     }
 
-    // Chọn ảnh và tự động copy vào thư mục 'image_vehicles/'
     public void chooseVehicleImage() {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Chọn hình ảnh xe");
@@ -595,18 +593,21 @@ public class ManagerView extends JFrame {
 
     public String validateSearch() { return txtSearchInput.getText().trim(); }
     
+    // Hủy lọc: dọn dẹp từ khóa và reset JCalendar
     public void cancelSearchVehicle() { 
         txtSearchInput.setText(""); 
         chkEnableDateFilter.setSelected(false);
-        spinnerFilterDate.setEnabled(false);
+        dateChooserFilter.setDate(null); // Clear ngày chọn trên lịch
+        dateChooserFilter.setEnabled(false);
     }
 
     public boolean isDateFilterEnabled() {
         return chkEnableDateFilter.isSelected();
     }
 
+    // Lấy Date trực tiếp từ JDateChooser
     public Date getSelectedFilterDate() {
-        return (Date) spinnerFilterDate.getValue();
+        return dateChooserFilter.getDate();
     }
 
     public void displayStatisticView() { statisticDialog.setVisible(true); }

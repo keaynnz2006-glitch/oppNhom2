@@ -7,7 +7,7 @@
         <mauXe>CAM</mauXe>
         <ngayVaoBai>13:57 03/08/2026</ngayVaoBai>
         <hinhAnh>image_vehicles\xe_1785935049344.jpg</hinhAnh>
-        <viTriDo>A01</viTriDo>
+        <viTriDo>A02</viTriDo>
         <giaTien>5000.0</giaTien>
     </VehicleDetail>
     <VehicleDetail>
@@ -39,15 +39,5 @@
         <hinhAnh>image_vehicles\xe_1785935312052.jpg</hinhAnh>
         <viTriDo>A01</viTriDo>
         <giaTien>5000.0</giaTien>
-    </VehicleDetail>
-    <VehicleDetail>
-        <id>8</id>
-        <bienSo></bienSo>
-        <loaiXe>Khác</loaiXe>
-        <mauXe>TRẮNG-ĐEN</mauXe>
-        <ngayVaoBai>20:20 05/08/2026</ngayVaoBai>
-        <hinhAnh>image_vehicles\xe_1785936097810.jpg</hinhAnh>
-        <viTriDo>C02</viTriDo>
-        <giaTien>2000.0</giaTien>
     </VehicleDetail>
 </VehicleDetails>

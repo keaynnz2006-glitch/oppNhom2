@@ -125,6 +125,22 @@ public class VehicleDetailController {
         public void actionPerformed(ActionEvent e) {
             VehicleDetail vehicle = managerView.getVehicleInfo();
             if (vehicle != null) {
+                String bienSoMoi = vehicle.getBienSo() != null ? vehicle.getBienSo().trim() : "";
+
+                // Chỉ kiểm tra trùng NẾU biển số có nhập dữ liệu (khác rỗng)
+                if (!bienSoMoi.isEmpty()) {
+                    boolean isDuplicate = managerVehicleDetail.getListVehicleDetails().stream()
+                            .anyMatch(v -> v.getBienSo() != null 
+                                        && !v.getBienSo().trim().isEmpty() 
+                                        && v.getBienSo().trim().equalsIgnoreCase(bienSoMoi));
+
+                    if (isDuplicate) {
+                        managerView.showMessage("LỖI: Biển số xe '" + bienSoMoi + "' đã tồn tại trong bãi!");
+                        return; // Dừng lại, không thêm vào bãi
+                    }
+                }
+
+                // Tiến hành thêm xe mới (Xe đạp/xe không biển số vẫn thêm bình thường)
                 managerVehicleDetail.add(vehicle);
                 
                 if (vehicle.getViTriDo() != null && !vehicle.getViTriDo().isEmpty()) {
@@ -146,6 +162,22 @@ public class VehicleDetailController {
         public void actionPerformed(ActionEvent e) {
             VehicleDetail vehicle = managerView.getVehicleInfo();
             if (vehicle != null) {
+                String bienSoMoi = vehicle.getBienSo() != null ? vehicle.getBienSo().trim() : "";
+
+                // Chỉ kiểm tra trùng NẾU biển số được nhập vào (khác rỗng)
+                if (!bienSoMoi.isEmpty()) {
+                    boolean isDuplicate = managerVehicleDetail.getListVehicleDetails().stream()
+                            .anyMatch(v -> v.getId() != vehicle.getId() 
+                                        && v.getBienSo() != null 
+                                        && !v.getBienSo().trim().isEmpty()
+                                        && v.getBienSo().trim().equalsIgnoreCase(bienSoMoi));
+
+                    if (isDuplicate) {
+                        managerView.showMessage("LỖI: Biển số xe '" + bienSoMoi + "' đã trùng với xe khác trong bãi!");
+                        return;
+                    }
+                }
+
                 try {
                     VehicleDetail oldVehicle = null;
                     for (VehicleDetail v : managerVehicleDetail.getListVehicleDetails()) {
@@ -356,4 +388,4 @@ public class VehicleDetailController {
             managerView.clearStatisticView();
         }
     }
-}   
+}

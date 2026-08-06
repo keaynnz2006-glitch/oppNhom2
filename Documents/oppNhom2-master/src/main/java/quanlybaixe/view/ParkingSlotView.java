@@ -194,7 +194,7 @@ public class ParkingSlotView extends JFrame {
         JScrollPane scrollPane = new JScrollPane(tableSlot);
         panelRight.add(scrollPane, BorderLayout.CENTER);
 
-        lblTotalCount = new JLabel("Tổng số vị trí: 0 | Đã đỗ: 0 |  Còn trống: 0");
+        lblTotalCount = new JLabel("Tổng số vị trí: 0 | Đã đỗ: 0 | Còn trống: 0");
         lblTotalCount.setFont(new Font("Segoe UI", Font.BOLD, 13));
         JPanel panelFooter = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panelFooter.add(lblTotalCount);
@@ -267,12 +267,12 @@ public class ParkingSlotView extends JFrame {
         if (list != null) {
             for (ParkingSlot slot : list) {
                 tableModel.addRow(new Object[]{
-                    slot.getId(),
-                    slot.getTenViTri(),
-                    slot.getLoaiSlot(),
-                    df.format(slot.getGiaTien()),
-                    slot.isTrangThai() ? "Đã đỗ" : "Còn trống",
-                    slot.getGhiChu()
+                        slot.getId(),
+                        slot.getTenViTri(),
+                        slot.getLoaiSlot(),
+                        df.format(slot.getGiaTien()),
+                        slot.isTrangThai() ? "Đã đỗ" : "Còn trống",
+                        slot.getGhiChu()
                 });
             }
         }
@@ -287,7 +287,20 @@ public class ParkingSlotView extends JFrame {
                 for (ParkingSlot slot : list) {
                     if (slot.getId() == selectedId) {
                         showParkingSlot(slot);
-                        setAddButtonEnabled(false); // Làm mờ/vô hiệu hóa nút Thêm khi đã chọn dòng
+                        setAddButtonEnabled(false);
+
+                        // --- RÀNG BUỘC: KHÓA SỬA/XÓA VÀ KHÓA LOẠI SLOT NẾU Ô ĐÃ ĐỖ ---
+                        if (slot.isTrangThai()) {
+                            cbLoaiSlot.setEnabled(false); // Khóa không cho đổi Loại Slot
+                            chkTrangThai.setEnabled(false);
+                            btnDelete.setEnabled(false);  // Khóa nút Xóa
+                            btnEdit.setEnabled(false);    // Khóa nút Sửa
+                        } else {
+                            cbLoaiSlot.setEnabled(true);  // Mở lại nếu ô còn trống
+                            chkTrangThai.setEnabled(true);
+                            btnDelete.setEnabled(true);
+                            btnEdit.setEnabled(true);
+                        }
                         break;
                     }
                 }
@@ -300,18 +313,22 @@ public class ParkingSlotView extends JFrame {
         long occupied = list != null ? list.stream().filter(ParkingSlot::isTrangThai).count() : 0;
         long available = total - occupied;
 
-        lblTotalCount.setText(String.format("Tổng số vị trí: %d  |   Đã đỗ: %d  |  Còn trống: %d", total, occupied, available));
+        lblTotalCount.setText(String.format("Tổng số vị trí: %d  |    Đã đỗ: %d  |  Còn trống: %d", total, occupied, available));
     }
 
     public void clearParkingSlotInfo() {
         txtId.setText("");
         txtTenViTri.setText("");
         cbLoaiSlot.setSelectedIndex(0);
+        cbLoaiSlot.setEnabled(true);     // Khôi phục quyền tương tác Loại Slot
+        chkTrangThai.setEnabled(true);
         autoFillPrice();
         chkTrangThai.setSelected(false);
         txtGhiChu.setText("");
         tableSlot.clearSelection();
-        setAddButtonEnabled(true); // Bật lại nút Thêm khi bấm "Nhập lại"
+        setAddButtonEnabled(true);
+        btnEdit.setEnabled(true);        // Khôi phục các nút bấm
+        btnDelete.setEnabled(true);
     }
 
     public void setAddButtonEnabled(boolean enabled) {
